@@ -1,0 +1,29 @@
+#Lines starting with # are comments.
+#Atom indices should follow the order in the .gro file.
+#EXample: H2O OICE1(0) HICE2(1) HICE3(2) / Urea C1(0) O2(1) N3(2) N4(3) H5(4) H6(5) H7(6) H8(7)
+#H2O must in order O H H ...
+#=============================
+#    HICE2    H5   :O2:   H7 
+#     /         \   ||   / 
+# :OICE1:       :N3-C1-N4:        
+#     \         /        \          
+#    HICE3    H6          H8
+#=============================
+#The RDF indicates that N3 and N4 can act as hydrogen bond donors, but not as acceptors, while O2 can serve as an acceptor.
+#Note that H2O-H2O hbonds are default. 
+#An example for H2O and urea:
+#Each entry following the header describes a possible hydrogen bond interaction between water (w) and an additive (a). The format for each entry is:
+#Note: order of entries does not affect processing.
+#! donor_type(w for water a for additive) acceptor_type(w for water a for additive) donor_atom_index aceptor_atom_index donor_H_atom_index theta_cut(°)
+#water-additive interaction
+! w a 0 1 1 35 #OICE1(0)-O2(1)-HICE2(1)
+! w a 0 1 2 35 #OICE1(0)-O2(1)-HICE3(2)
+! a w 2 0 4 35 #N3(2)-OICE1(0)-H5(4)
+! a w 2 0 5 35 #N3(2)-OICE1(0)-H6(5)
+! a w 3 0 6 35 #N4(3)-OICE1(0)-H7(6)
+! a w 3 0 7 35 #N4(3)-OICE1(0)-H8(7)
+#additive-additive interaction
+! a a 2 1 4 35 #N3(2)-O2(1)-H5(4)
+! a a 2 1 5 35 #N3(2)-O2(1)-H6(5)
+! a a 3 1 6 35 #N4(3)-O2(1)-H7(6)
+! a a 3 1 7 35 #N4(3)-O2(1)-H8(7)
