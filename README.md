@@ -48,17 +48,21 @@ TRACE automatically adjusts computation based on the input files provided. Some 
 
 `/path/to/TRACE/TRACE.exe -w example_H2O.gro -g example_guest.gro -a example_urea.gro -h hbond_urea.txt`
 
-### Visualization with VMD
+**Note:** When calculating additive-coordinated cages, a valid hydrogen bond definition file conforming to our specifications must be provided. The format and details of this file will be discussed in the "Command Line Options" section.
+
+**Note:** Water, guest molecules, and additives must be provided as separate `.gro` files. You can use GROMACS' `gmx_mpi make_ndx` tool to create these separate index groups from your full system trajectory.
+
+**Note:** We generate a total of 9 output files for analysis.  
+All output files are saved by default in the current working directory.  
+The output file names are fixed (non-randomized), so please be careful to avoid overwriting existing files.
+
+For detailed information, see Section 5: Output Files and Analysis.
+
+### 4. Visualization with VMD
 
 To visualize the results, you need to install VMD (Visual Molecular Dynamics).
 
 After installing and launching VMD, load the visualization script by running the following command in the VMD console (Tcl prompt):
 
-'source /path/to/TRACE/visualize.tcl'
+`source /path/to/TRACE/visualize.tcl`
 
-Note: When calculating additive-coordinated cages, a valid hydrogen bond definition file conforming to our specifications must be provided. The format and details of this file will be discussed in the "Command Line Options" section.
-
-Note: Water, guest molecules, and additives must be provided as separate `.gro` files. You can use GROMACS' `gmx_mpi make_ndx` tool to create these separate index groups from your full system trajectory.
-
-Note: We generate a total of 9 output files for analysis.
-For detailed information, see Section 5: Output Files and Analysis.
