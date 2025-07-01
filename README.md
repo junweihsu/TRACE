@@ -1,4 +1,28 @@
 # TRACE - Topological Ring and Additive-Coordinated Cage Explorer
+
+## Table of Contents
+
+- [1. Introduction](#1-introduction)
+- [2. Usage](#2-usage)
+  - [2.1 Clone the repository](#21-clone-the-repository)
+  - [2.2 Compile the program](#22-compile-the-program)
+  - [2.3 Run TRACE](#23-run-trace)
+  - [2.4 Visualization with VMD](#24-visualization-with-vmd)
+- [3. File Format](#3-file-format)
+  - [3.1 H₂O file](#31-h₂o-file)
+  - [3.2 Guest file](#32-guest-file)
+  - [3.3 Additive Hydrogen Bond Definition File](#33-additive-hydrogen-bond-definition-file)
+- [4. Command Line Options](#4-command-line-options)
+- [5. Output Files and Analysis](#5-output-files-and-analysis)
+  - [5.1 `cage.txt`: Cage Type Summary](#51-cagetxt-cage-type-summary)
+  - [5.2 `detail_cage.txt`: Cage Details](#52-detail_cagetxt-cage-details)
+  - [5.3 `visual.gro`](#53-visualgro)
+  - [5.4 `visual_index.txt`](#54-visual_indextxt)
+  - [5.5 `occupancy.txt`](#55-occupancytxt)
+  - [5.6 `cluster.txt`](#56-clustertxt)
+  - [5.7 `crystallinity.txt`](#57-crystallinitytxt)
+  - [5.8 `ring.txt`](#58-ringtxt)
+  - [5.9 `ring_detail.txt`](#59-ring_detailtxt)
 ## 1. Introduction
 
 TRACE (Topological Ring and Additive-Coordinated Cage Explorer) is a high-performance algorithm written in `C++`, developed to identify and classify hydrate cage structures from molecular dynamics (MD) simulations of clathrate hydrates. Designed to analyze GROMACS-format trajectories (`.gro`), TRACE provides comprehensive detection of structural motifs including rings, cups, incomplete cages, and complete cages—particularly those formed through additive–water interactions.
@@ -69,6 +93,10 @@ Once installed, launch VMD from the terminal:
 In the VMD Tk Console, run the following command to load the visualization script [`visualize.tcl`](./visualize.tcl):
 
 `source /path/to/TRACE/visualize.tcl`
+
+Make sure you are already in the analysis output directory that contains `visual.gro` and `visual_index.txt`, and that the analysis has been completed.
+
+> By default, the script assumes the required files are in the current working directory (`./`).
 
 ## 3. File Format
 
