@@ -131,8 +131,7 @@ Where:
 
 Atom indices **must match the order in the `.gro` file**. For example, water must be ordered as `O H1 H2 ...`, and the additive atoms should follow their appearance in the file.  
 
-For example:
-|  H2O.gro example          |
+For H₂O.gro example:
 |---------------------------|
 |    1H2O  OICE1    1 ...   | 
 |    1H2O  HICE2    2 ...   | 
@@ -140,16 +139,15 @@ For example:
 |    2H2O  OICE1    4 ...   |
 |    ...                    |
 
-For urea example:
-|  Urea.gro example         |
+For urea.gro example:
 |---------------------------|
-|    1Urea    C1    1...    |  
+|    1Urea    C1    1 ...   |  
 |    1Urea    O2    2 ...   | 
-|    1Urea    N3    3...    |
-|    1Urea    N4    4...    |  
+|    1Urea    N3    3 ...   |
+|    1Urea    N4    4 ...   |  
 |    1Urea    H5    5 ...   | 
-|    1Urea    H6    6...    |
-|    1Urea    H7    7...    |  
+|    1Urea    H6    6 ...   |
+|    1Urea    H7    7 ...   |  
 |    1Urea    H8    8 ...   | 
 |    2Urea    C1    9 ...   |
 |    ...                    |
