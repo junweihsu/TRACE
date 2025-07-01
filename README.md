@@ -270,18 +270,31 @@ Columns include:
 This file includes per-cage information such as topology, constituent molecules, spatial center, and cluster association.
 
 Each frame includes a summary of the number of different ring sizes, cup and cage motifs it contains. For example:
+
 Frame: 2
+
 4r: 326
+
 5r: 1489
+
 6r: 1516
+
 7r: 176
+
 8r: 41
+
 9r: 1
+
 10r: 0
+
 cup: 1557
+
 SEC: 10
+
 NSEC: 0
+
 IC: 12
+
 This indicates the total number of 4- to 10-membered rings, cup and cage structures found across the trajectory.
 
 Each cage includes a summary of its geometry properties. For example:
@@ -350,6 +363,8 @@ Format example:
 
 2 13 6 6 1 1 1 1
 
+...
+
 - Each number after the frame index represents the size of a cage cluster.
 - Cage clusters are defined by cages sharing polygonal faces and grouped as one cluster.
 
@@ -377,13 +392,15 @@ Records how many 4-, 5-, and 6-membered rings each molecule (water or additive) 
 
 Example format:
 
-#frame 1:H2O ... Nw:H2O ... Na:add (4r,5r,6r per molecule)
+#frame 1:H2O ... Nw:H2O ... Na:add 
 
 1 2,4,5 1,0,6 ... 4,0,0
 
 2 4,5,2 2,1,2 ... 3,2,3
 
 ...
+
+-4r,5r,6r per molecule (from 1 to Nw + Na)
 
 ### 5.9 ring_detail.txt
 
