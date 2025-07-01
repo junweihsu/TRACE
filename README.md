@@ -23,6 +23,7 @@
   - [5.7 `crystallinity.txt`](#57-crystallinitytxt)
   - [5.8 `ring.txt`](#58-ringtxt)
   - [5.9 `ring_detail.txt`](#59-ring_detailtxt)
+- [6. License](#6-license)
 ## 1. Introduction
 
 TRACE (Topological Ring and Additive-Coordinated Cage Explorer) is a high-performance algorithm written in `C++`, developed to identify and classify hydrate cage structures from molecular dynamics (MD) simulations of clathrate hydrates. Designed to analyze GROMACS-format trajectories (`.gro`), TRACE provides comprehensive detection of structural motifs including rings, cups, incomplete cages, and complete cages—particularly those formed through additive–water interactions.
@@ -251,7 +252,7 @@ File names are fixed and will be overwritten if they already exist — please ba
 
 ---
 
-### 5.1 `cage.txt`: Cage Type Summary
+### 5.1 cage.txt
 
 This file reports the number of each cage type per frame. Cage types follow the **standard edge-saturated cage (SEC)** notation (e.g., `4(1)5(10)6(2)` represents a cage made of 1 quadrilateral, 10 pentagons, and 2 hexagons).
 
@@ -264,7 +265,7 @@ Columns include:
 
 ---
 
-### 5.2 `detail_cage.txt`: Cage Details
+### 5.2 detail_cage.txt
 
 This file includes per-cage information such as topology, constituent molecules, spatial center, and cluster association.
 
@@ -321,60 +322,70 @@ while additive molecule indices range from `Nw + 1` to `Nw + Na`.)
 > Although .gro files wrap residue IDs and atom numbers beyond 99999 due to fixed-width formatting, TRACE internally assigns unique sequential molecule indices based on input order. This ensures that each water, guest, and additive molecule has a unique and consistent identifier throughout the analysis.  
 > All indices refer to the **input sequence order**, not `.gro` residue IDs.
 
-### 5.3 `visual.gro`
+### 5.3 visual.gro
 
 Generates a `.gro` file for visualization in VMD.
 
-### 5.4 `visual_index.txt`
+### 5.4 visual_index.txt
 
 Generates an index file used for coloring in VMD.
 
 For usage details, please refer to Section 2.4: Visualization with VMD.
 
-### 5.5 `occupancy.txt`
+### 5.5 occupancy.txt
 
 This file records the total number of cages (SEC, non-SEC, IC combined) and the number of cages occupied by guest molecules per frame. It also reports the vacancy rate (`vac`), defined as: vac = 1 - (ALL_F / ALL)
 
-### 5.6 `cluster.txt`
+### 5.6 cluster.txt
 
 This file records cage clusters for each frame, sorted from largest to smallest cluster size.
 
 Format example:
+
 #Frame cluster 1 (size) ... cluster n (size)
+
 0 11 4 3 2 1 1
+
 1 13 4 2 2 1 1 1 1 1
+
 2 13 6 6 1 1 1 1
 
-- Each number after the frame index represents the size of a cage cluster.  
+- Each number after the frame index represents the size of a cage cluster.
 - Cage clusters are defined by cages sharing polygonal faces and grouped as one cluster.
 
-### 5.7 `crystallinity.txt`
+### 5.7 crystallinity.txt
 
 Records how many cages (SECs + non-SECs + IC) each molecule (water or additive) participates in per frame, along with the average crystallinity.
 
 Example format:
 
 #frame 1H2O ... nH2O ... nadd Crystallinity
+
 1 4 3 4 ... 4 3.750
-2 4 4 4 ... 3 3.750
-3 4 4 4 ... 4 4.000
+
+2 4 4 4 ... 4 4.000
+
 ...
 
 - `1:H2O ... Nw:H2O`: indices of water molecules from 1 to Nw  
 - `Na:add`: additive molecule indices from Nw+1 to Nw+Na 
 - `Crystallinity`: average number of cages each molecule participates in
 
-### 5.8 `ring.txt`
+### 5.8 ring.txt
 
 Records how many 4-, 5-, and 6-membered rings each molecule (water or additive) participates in per frame.
 
 Example format:
+
 #frame 1:H2O ... Nw:H2O ... Na:add (4r,5r,6r per molecule)
+
 1 2,4,5 1,0,6 ... 4,0,0
+
 2 4,5,2 2,1,2 ... 3,2,3
+
 ...
 
-### 5.9 `ring_detail.txt`
+### 5.9 ring_detail.txt
 
 Records the molecular composition of each ring in each frame. Molecule indices range from `1` to `Nw + Na` (water and additive molecules).
 
@@ -387,3 +398,21 @@ This means the ring is formed by molecules with indices `1, 167, 178, 181, 297`,
 1–167, 167–178, 178–181, 181–297, 297–1
 
 - Each ring is assumed to form a closed loop based on hydrogen bonding order.
+  
+## 6. License
+TRACE v1.0 - Topological Ring and Additive-Coordinated Cage Explorer
+Copyright (C) 2025 Jun Wei Hsu, Shiang-Tai Lin
+COMET Laboratory, National Taiwan University
+
+TRACE is free software: you can redistribute it and/or modify  
+it under the terms of the GNU General Public License as published  
+by the Free Software Foundation, either version 3 of the License,  
+or (at your option) any later version.
+
+TRACE is distributed in the hope that it will be useful,  
+but WITHOUT ANY WARRANTY; without even the implied warranty of  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the  
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License  
+along with TRACE. If not, see [https://www.gnu.org/licenses/](https://www.gnu.org/licenses/).
