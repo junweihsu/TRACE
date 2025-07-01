@@ -270,31 +270,20 @@ Columns include:
 This file includes per-cage information such as topology, constituent molecules, spatial center, and cluster association.
 
 Each frame includes a summary of the number of different ring sizes, cup and cage motifs it contains. For example:
-
+```plaintext
 Frame: 2
-
 4r: 326
-
 5r: 1489
-
 6r: 1516
-
 7r: 176
-
 8r: 41
-
 9r: 1
-
 10r: 0
-
 cup: 1557
-
 SEC: 10
-
 NSEC: 0
-
 IC: 12
-
+```
 This indicates the total number of 4- to 10-membered rings, cup and cage structures found across the trajectory.
 
 Each cage includes a summary of its geometry properties. For example:
