@@ -14,3 +14,39 @@ TRACE achieves both high accuracy and computational efficiency across a wide ran
 - Guest molecule occupancy analysis for each cage.
 
 This tool was developed as part of an academic study on hydrate formation dynamics. For more information, please refer to the upcoming publication [reference pending].
+
+## Usage
+
+### 1. Clone the repository
+
+git clone https://github.com/qwe88866/TRACE.git /path/to/TRACE
+
+Replace `/path/to/TRACE` with the actual path where you cloned the repository.
+
+### 2. Compile the program
+
+Compile TRACE using `g++` with OpenMP support:
+
+g++ -fopenmp /path/to/TRACE/TRACE.cpp -o /path/to/TRACE/TRACE.exe
+
+### 3. Run TRACE
+
+cd /path/to/TRACE/example
+
+TRACE automatically adjusts computation based on the input files provided. Some example usages:
+
+- Compute only water cages:
+
+/path/to/TRACE/TRACE.exe -w example_H2O.gro
+
+- Compute cages for water and guest molecules:
+
+/path/to/TRACE/TRACE.exe -w example_H2O.gro -g example_guest.gro
+
+- Compute cages for water, urea additives, and guests:
+
+/path/to/TRACE/TRACE.exe -w example_H2O.gro -g example_guest.gro -a example_urea.gro -h hbond_urea.txt
+
+Note: When calculating additive-coordinated cages, a valid hydrogen bond definition file conforming to our specifications must be provided. The format and details of this file will be discussed in the "Command Line Options" section.
+
+Note: Water, guest molecules, and additives must be provided as separate `.gro` files. You can use GROMACS' `gmx_mpi make_ndx` tool to create these separate index groups from your full system trajectory.
