@@ -111,16 +111,18 @@ Because the program does **not** require users to input the number of atoms per 
 it relies on **sequential and consistent (`resid`)** IDs  to identify molecule boundaries. This is the default behavior for GROMACS `.gro` output.
 
 For example:
-| Correct format        | Wrong format          | Correct format        | Wrong format          |
-|-----------------------|-----------------------|-----------------------|-----------------------|
-|    1H2O   OICE  ...   |    1H2O   OICE  ...   |    1CO2   C_EP  ...   |    1CO2   C_EP  ...   |
-|    1H2O   HICE  ...   |    1H2O   HICE  ...   |    1CO2   O_EP  ...   |    2CO2   C_EP  ...   |
-|    1H2O   HICE  ...   |    1H2O   HICE  ...   |    1CO2   O_EP  ...   |    3CO2   C_EP  ...   |
-|    2H2O   OICE  ...   |    1H2O   OICE  ...   |    2CO2   C_EP  ...   |    4CO2   C_EP  ...   |
-|    2H2O   HICE  ...   |    1H2O   HICE  ...   |    2CO2   O_EP  ...   |    5CO2   C_EP  ...   |
-|    2H2O   HICE  ...   |    1H2O   HICE  ...   |    2CO2   O_EP  ...   |    6CO2   C_EP  ...   |
-|    3H2O   OICE  ...   |    1H2O   OICE  ...   |    3CO2   C_EP  ...   |    7CO2   C_EP  ...   |
-|    ...                |    ...                |    ...                |    ...                |
+| Correct format        | Correct format        | Wrong format          | Correct format        | Correct format        |
+|-----------------------|-----------------------|-----------------------|-----------------------|-----------------------|
+|    1H2O   OICE  ...   |    1H2O   OICE  ...   |    1H2O   OICE  ...   |    1CO2   C_EP  ...   |    1CO2   C_EP  ...   |
+|    1H2O   HICE  ...   |    2H2O   OICE  ...   |    1H2O   HICE  ...   |    1CO2   O_EP  ...   |    2CO2   C_EP  ...   |
+|    1H2O   HICE  ...   |    3H2O   OICE  ...   |    1H2O   HICE  ...   |    1CO2   O_EP  ...   |    3CO2   C_EP  ...   |
+|    2H2O   OICE  ...   |    4H2O   OICE  ...   |    1H2O   OICE  ...   |    2CO2   C_EP  ...   |    4CO2   C_EP  ...   |
+|    2H2O   HICE  ...   |    5H2O   OICE  ...   |    1H2O   HICE  ...   |    2CO2   O_EP  ...   |    5CO2   C_EP  ...   |
+|    2H2O   HICE  ...   |    6H2O   OICE  ...   |    1H2O   HICE  ...   |    2CO2   O_EP  ...   |    6CO2   C_EP  ...   |
+|    3H2O   OICE  ...   |    7H2O   OICE  ...   |    1H2O   OICE  ...   |    3CO2   C_EP  ...   |    7CO2   C_EP  ...   |
+|    ...                |    ...                |    ...                |    ...                |    ...                |
+
+> Improper formatting may cause TRACE to misidentify molecule boundaries or generate invalid results.
 
 ### 3.1 H2O file 
 
