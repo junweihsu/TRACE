@@ -111,16 +111,16 @@ Because the program does **not** require users to input the number of atoms per 
 it relies on **sequential and consistent (`resid`)** IDs  to identify molecule boundaries. This is the default behavior for GROMACS `.gro` output.
 
 For example:
-| Correct format        | Wrong format          |
-|-----------------------|-----------------------|
-|    1H2O   OICE  ...   |    1H2O   OICE  ...   |
-|    1H2O   HICE  ...   |    1H2O   HICE  ...   |
-|    1H2O   HICE  ...   |    1H2O   HICE  ...   |
-|    2H2O   OICE  ...   |    1H2O   OICE  ...   |
-|    2H2O   HICE  ...   |    1H2O   HICE  ...   |
-|    2H2O   HICE  ...   |    1H2O   HICE  ...   |
-|    3H2O   OICE  ...   |    1H2O   OICE  ...   |
-|    ...                |    ...                |
+| Correct format        | Wrong format          | Correct format        | Wrong format          |
+|-----------------------|-----------------------|-----------------------|-----------------------|
+|    1H2O   OICE  ...   |    1H2O   OICE  ...   |    1CO2   C_EP  ...   |    1CO2   C_EP  ...   |
+|    1H2O   HICE  ...   |    1H2O   HICE  ...   |    1CO2   O_EP  ...   |    2CO2   C_EP  ...   |
+|    1H2O   HICE  ...   |    1H2O   HICE  ...   |    1CO2   O_EP  ...   |    3CO2   C_EP  ...   |
+|    2H2O   OICE  ...   |    1H2O   OICE  ...   |    2CO2   C_EP  ...   |    4CO2   C_EP  ...   |
+|    2H2O   HICE  ...   |    1H2O   HICE  ...   |    2CO2   O_EP  ...   |    5CO2   C_EP  ...   |
+|    2H2O   HICE  ...   |    1H2O   HICE  ...   |    2CO2   O_EP  ...   |    6CO2   C_EP  ...   |
+|    3H2O   OICE  ...   |    1H2O   OICE  ...   |    3CO2   C_EP  ...   |    7CO2   C_EP  ...   |
+|    ...                |    ...                |    ...                |    ...                |
 
 ### 3.1 H2O file 
 
@@ -147,6 +147,32 @@ For example:
 - The guest molecule uses the **first atom as its center point**.  
 - To include multiple guest molecule types (e.g., CO₂, CH₄), extract a single representative atom per molecule (such as the carbon atom for CO₂ and CH₄) to serve as the molecule’s center point.
 - Use `make_ndx` to create index groups for each guest type, then use `trjconv` to extract these single-point representations and merge them into a single `.gro` file for processing by TRACE.
+
+For more complex guest molecules that cannot be effectively represented by a single center point atom (e.g., urea or linear molecules like butane), an advanced approach is recommended:
+
+-Break down each guest molecule into several atoms (e.g., 2 nitrogen atoms, 1 oxygen atom, and 1 carbon atom for urea; 4 carbon atoms for butane),  
+  treating each atom as an individual “guest molecule” unit. This can be achieved by using `make_ndx` to select these atoms separately,  
+  then extracting them with `trjconv` to produce a `.gro` file where one guest molecule corresponds to multiple independent atoms for TRACE analysis.
+
+For example:
+| example1              | example2              |
+|-----------------------|-----------------------|
+|    1CO2   C_EP  ...   |    1CO2   C_EP  ...   |
+|    2CO2   C_EP  ...   |    2CO2   C_EP  ...   |
+|    3CO2   C_EP  ...   |    3Urea    C1  ...   |   
+|    4CO2   C_EP  ...   |    4Urea    O2  ...   |
+|    5CH4    CT1  ...   |    5Urea    N3  ...   | 
+|    6CH4    CT1  ...   |    6Urea    N4  ...   |
+|    7CH4    CT1  ...   |    7Urea    C1  ...   |
+|    8Urea    C1  ...   |    8Urea    O2  ...   | 
+|    9Urea    C1  ...   |    9Urea    N3  ...   |
+|   10Urea    C1  ...   |   10Urea    N4  ...   |
+|     ...               |    ...                |    
+
+> 💡 **Note:** In this advanced guest atom selection mode, each selected atom is treated as an individual guest unit.  
+> Therefore, the guest indices reported in [Section 5.2: `detail_cage.txt`](#52-detail_cagetxt) correspond directly to the **input order in the `.gro` file**.  
+> This allows users to backtrack from the guest index (in a given cage) to the specific atom — and thus, to the specific molecule and position — based on their `.gro` file structure.
+
 
 ### 3.3 Additive Hydrogen Bond Definition File
 
