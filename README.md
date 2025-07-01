@@ -9,7 +9,7 @@
   - [2.3 Run TRACE](#23-run-trace)
   - [2.4 Visualization with VMD](#24-visualization-with-vmd)
 - [3. File Format](#3-file-format)
-  - [3.1 H₂O file](#31-h₂o-file)
+  - [3.1 H2O file](#31-h2o-file)
   - [3.2 Guest file](#32-guest-file)
   - [3.3 Additive Hydrogen Bond Definition File](#33-additive-hydrogen-bond-definition-file)
 - [4. Command Line Options](#4-command-line-options)
@@ -122,7 +122,7 @@ For example:
 |    3H2O   OICE  ...   |    1H2O   OICE  ...   |
 |    ...                |    ...                |
 
-### 3.1 H₂O file 
+### 3.1 H2O file 
 
 - The first atom must be **O** (oxygen).  
 - If present, **H1** and **H2** atoms must immediately follow as the second and third atoms, respectively.  
@@ -313,7 +313,7 @@ Each cage includes a summary of its geometry properties. For example:
 - `g [ ... ]` lists guest molecule indices (1 to Ng) occupying the cage.
 - `a [ ... ]` lists up to 3 additives closest to the cage center, formatted as: add_index:distance (nm).
 
-(Note:  
+Note:  
 - `Nw` = number of water molecules  
 - `Ng` = number of guest molecules  
 - `Na` = number of additive molecules  
@@ -332,7 +332,7 @@ Generates a `.gro` file for visualization in VMD.
 
 Generates an index file used for coloring in VMD.
 
-For usage details, please refer to Section 2.4: Visualization with VMD.
+For usage details, please refer to [2.4 Visualization with VMD](#24-visualization-with-vmd) with VMD.
 
 ### 5.5 occupancy.txt
 
@@ -356,6 +356,7 @@ Format example:
 
 - Each number after the frame index represents the size of a cage cluster.
 - Cage clusters are defined by cages sharing polygonal faces and grouped as one cluster.
+- To identify the specific cage types belonging to each cluster, please refer to the corresponding frame section in [Section 5.2 detail_cage.txt](#52-detail_cagetxt), which provides detailed cage topology and membership information.
 
 ### 5.7 crystallinity.txt
 
