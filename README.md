@@ -171,3 +171,33 @@ For urea.gro example:
 
 > 💡 **Note:** water–water hydrogen bonds are built-in and do not need to be listed.
 You can refer to the provided [`hbond_urea.txt`](./example/hbond_urea.txt) file for a complete working example.
+
+## 4. Command Line Options
+
+TRACE accepts both **relative** and **absolute** file paths.  
+Only the `-w` option is required; all others are optional.
+
+### Required Parameter
+
+| Option | Example     | Description         |
+|--------|-------------|---------------------|
+| `-w`   | `H2O.gro`   | Water `.gro` file   |
+
+### Optional Parameters
+
+| Option  | Example         | Description |
+|---------|-----------------|-------------|
+| `-g`    | `CO2.gro`       | Guest molecule `.gro` file |
+| `-a`    | `add.gro`       | Additive molecule `.gro` file |
+| `-h`    | `hbond.txt`     | Hydrogen bond definition file (see [3.3 Additive Hydrogen Bond Definition File](#33-additive-hydrogen-bond-definition-file)) |
+| `-b`    | `0`             | Starting frame index (default: `0`) |
+| `-e`    | `2000`          | Ending frame index |
+| `-si`   | `10`            | Frame shift interval (default: `0`) |
+| `-r`    | `0.36`          | H-bond O–O cutoff distance in nm (default: `0.36`) |
+| `-th`   | `35`            | H-bond angle (O–O–H) threshold in degrees (default: `35`; use `< 0` to disable angle check) |
+| `-DA`   | `90`            | Dihedral angle tolerance (default: `90°`) |
+| `-IA`   | `20`            | Interior angle tolerance for rings ≥7 (default: `20°`; should be < 30) |
+| `-mr`   | `8`             | Maximum ring size to detect (6–12; default: `8`) |
+| `-cl`   | `yes` / `no`    | Include incomplete cages in cluster detection (default: `yes`) |
+| `-nb`   | `4 4 4`         | Number of sub-boxes in `x y z` (default: box length / 1.2 nm, rounded) |
+| `-nt`   | `8`             | Number of threads to use (default: `1`) |
