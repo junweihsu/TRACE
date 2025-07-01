@@ -1,6 +1,6 @@
 #Lines starting with # are comments.
 #Atom indices should follow the order in the .gro file.
-#EXample: H2O OICE1(0) HICE2(1) HICE3(2) / Urea C1(0) O2(1) N3(2) N4(3) H5(4) H6(5) H7(6) H8(7)
+#Example: H2O OICE1(0) HICE2(1) HICE3(2) / Urea C1(0) O2(1) N3(2) N4(3) H5(4) H6(5) H7(6) H8(7)
 #H2O must in order O H H ...
 #=============================
 #    HICE2    H5   :O2:   H7 
