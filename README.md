@@ -26,7 +26,9 @@ Clone the repository to your desired directory (replace `/path/to/TRACE` with yo
 ### 2.2 Compile the program
 
 Compile TRACE using `g++` with OpenMP support:
+
 `g++ -fopenmp /path/to/TRACE/TRACE.cpp -o /path/to/TRACE/TRACE.exe`
+
 - A C++ compiler supporting at least C++11 standard (e.g., g++ 4.8 or later).
 - OpenMP support enabled (g++ 4.8 or later recommended).
 
@@ -54,7 +56,7 @@ TRACE automatically adjusts computation based on the input files provided. Some 
 All output files are saved by default in the current working directory.  
 The output file names are fixed (non-randomized), so please be careful to avoid overwriting existing files.
 
-For detailed information, see Section 4. Output Files and Analysis.
+For detailed information, see Section 5. Output Files and Analysis.
 
 ### 2.4 Visualization with VMD
 
@@ -197,7 +199,96 @@ Only the `-w` option is required; all others are optional.
 | `-th`   | `35`            | H-bond angle (O–O–H) threshold in degrees (default: `35`; use `< 0` to disable angle check) |
 | `-DA`   | `90`            | Dihedral angle tolerance (default: `90°`) |
 | `-IA`   | `20`            | Interior angle tolerance for rings ≥7 (default: `20°`; should be < 30) |
-| `-mr`   | `8`             | Maximum ring size to detect (6–12; default: `8`) |
+| `-mr`   | `10`             | Maximum ring size to detect (6–12; default: `10`) |
 | `-cl`   | `yes` / `no`    | Include incomplete cages in cluster detection (default: `yes`) |
 | `-nb`   | `4 4 4`         | Number of sub-boxes in `x y z` (default: box length / 1.2 nm, rounded) |
 | `-nt`   | `8`             | Number of threads to use (default: `1`) |
+
+## 5. Output Files and Analysis
+
+TRACE generates **9 output files** in the current working directory.  
+File names are fixed and will be overwritten if they already exist — please back up your results before rerunning.
+
+| Filename               | Description |
+|------------------------|-------------|
+| `cage.txt`             | Summary of all cage types detected per frame. |
+| `detail_cage.txt`      | Detailed topology and molecule membership for each cage. |
+| `visual.gro`           | Structure file for visualizing cages in VMD. |
+| `visual_index.txt`     | Cage-type index for coloring atoms in VMD (used with `visualize.tcl`). |
+| `occupancy.txt`        | Frame-by-frame guest molecule occupancy per cage. |
+| `cluster.txt`          | Cage cluster membership and statistics. |
+| `crystallinity.txt`    | Crystallinity metric of the system over time. |
+| `ring.txt`             | Total number of n-membered rings in each frame. |
+| `ring_detail.txt`      | Complete list of all individual rings detected and their constituent molecules. |
+
+---
+
+### 5.1 `cage.txt`: Cage Type Summary
+
+This file reports the number of each cage type per frame. Cage types follow the **standard edge-saturated cage (SEC)** notation (e.g., `4(1)5(10)6(2)` represents a cage made of 1 quadrilateral, 10 pentagons, and 2 hexagons).
+
+Columns include:
+- `SEC` : standard edge-saturated cages  
+- `non-SEC` : nonstandard edge-saturated cages  
+- `IC` : incomplete cages  
+- `others` : all other non-listed `SEC` cage types  
+- Detailed cage types (e.g., `1,10,2` = 1 quadrilateral, 10 pentagons, 2 hexagons)
+
+---
+
+### 5.2 `detail_cage.txt`: Cage Details
+
+This file includes per-cage information such as topology, constituent molecules, spatial center, and cluster association.
+
+Each frame includes a summary of the number of different ring sizes, cup and cage motifs it contains. For example:
+Frame: 2
+4r: 326
+5r: 1489
+6r: 1516
+7r: 176
+8r: 41
+9r: 1
+10r: 0
+cup: 1557
+SEC: 10
+NSEC: 0
+IC: 12
+This indicates the total number of 4- to 10-membered rings, cup and cage structures found across the trajectory.
+
+Each cage includes a summary of its geometry properties. For example:
+
+```plaintext
+#cage8 1 Type: 5(12)6(2) t: 72 F: 14 E: 36 V:24
+ CP [ 2.062 1.146 6.043 ]
+ V [ 8 97 107 318 453 602 669 752 853 1120 1122 1494 1660 1688 1982 2167 2238 2421 2514 2594 2718 2824 2936 2983 ]
+ g [ 1444 ]
+ a [ 3002: 0.630 3050: 0.688 3037: 1.031 ]
+```
+
+**Cage label symbols:**
+- `#cage n`     : SEC  
+- `@cage n`     : non-SEC  
+- `!cage n`     : IC  
+- `#a-cage n`   : additive-coordinated SEC  
+- `@a-cage n`   : additive-coordinated non-SEC  
+- `!a-cage n`   : additive-coordinated IC  
+(n is the cluster ID, sorted from largest to smallest. Refer to cluster.txt for cluster composition and size.)
+
+**Sections:**
+- `F`, `E`, `V`: number of polygonal faces, edges, and vertices  
+- `t`: theoretical number of vertices (assuming isolated faces)  
+- `CP [x y z]`: geometric center of the cage  
+- `V [ ... ]` lists indices (1 to Nw+Na) of water and additive molecules in the cage.
+- `g [ ... ]` lists guest molecule indices (1 to Ng) occupying the cage.
+- `a [ ... ]` lists up to 3 additives closest to the cage center, formatted as: add_index:distance (nm).
+
+(Note:  
+- `Nw` = number of water molecules  
+- `Ng` = number of guest molecules  
+- `Na` = number of additive molecules  
+
+Water molecule indices range from `1` to `Nw`,  
+while additive molecule indices range from `Nw + 1` to `Nw + Na`.)
+
+> Although .gro files wrap residue IDs and atom numbers beyond 99999 due to fixed-width formatting, TRACE internally assigns unique sequential molecule indices based on input order. This ensures that each water, guest, and additive molecule has a unique and consistent identifier throughout the analysis.  
+> All indices refer to the **input sequence order**, not `.gro` residue IDs.
