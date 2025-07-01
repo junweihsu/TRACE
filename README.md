@@ -1,5 +1,5 @@
 # TRACE - Topological Ring and Additive-Coordinated Cage Explorer
-## Introduction
+## 1. Introduction
 
 TRACE (Topological Ring and Additive-Coordinated Cage Explorer) is a high-performance algorithm developed to identify and classify hydrate cage structures from molecular dynamics (MD) simulations of clathrate hydrates. Designed to analyze GROMACS-format trajectories (`.gro`), TRACE provides comprehensive detection of structural motifs including rings, cups, incomplete cages, and complete cages—particularly those formed through additive–water interactions.
 
@@ -15,22 +15,22 @@ TRACE achieves both high accuracy and computational efficiency across a wide ran
 
 This tool was developed as part of an academic study on hydrate formation dynamics. For more information, please refer to the upcoming publication [reference pending].
 
-## Usage
+## 2. Usage
 
-### 1. Clone the repository
+###  Clone the repository
 
 Clone the repository to your desired directory (replace `/path/to/TRACE` with your chosen path):
 
 `git clone https://github.com/qwe88866/TRACE.git /path/to/TRACE`
 
-### 2. Compile the program
+###  Compile the program
 
 Compile TRACE using `g++` with OpenMP support:
 `g++ -fopenmp /path/to/TRACE/TRACE.cpp -o /path/to/TRACE/TRACE.exe`
 - A C++ compiler supporting at least C++11 standard (e.g., g++ 4.8 or later).
 - OpenMP support enabled (g++ 4.8 or later recommended).
 
-### 3. Run TRACE
+###  Run TRACE
 
 `cd /path/to/TRACE/example`
 
@@ -58,7 +58,7 @@ The output file names are fixed (non-randomized), so please be careful to avoid 
 
 For detailed information, see Section 5: Output Files and Analysis.
 
-### 4. Visualization with VMD
+###  Visualization with VMD
 
 To visualize the results, you need to install VMD (Visual Molecular Dynamics).
 
