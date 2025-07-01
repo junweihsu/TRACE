@@ -48,12 +48,7 @@ TRACE automatically adjusts computation based on the input files provided. Some 
 
 `/path/to/TRACE/TRACE.exe -w example_H2O.gro -g example_guest.gro -a example_urea.gro -h hbond_urea.txt`
 
-**Note:** Water, guest molecules, and additives must be provided as separate `.gro` files.  
-You can use GROMACS' `trjconv` and `make_ndx` tools to extract and create these separate index groups from your full system trajectory.  
-(See [Section 3: File Format](#3-file-format) for details on file structure.)
-
-**Note:** When calculating additive-coordinated cages, a valid hydrogen bond definition file conforming to our specifications must be provided.
-(See [Section 3: File Format](#3-file-format) for details on file structure.)
+**Note:** See [Section 3: File Format](#3-file-format) for details on file structure.
 
 **Note:** We generate a total of 9 output files for analysis.  
 All output files are saved by default in the current working directory.  
@@ -85,16 +80,16 @@ Because the program does **not** require users to input the number of atoms per 
 it relies on **sequential and consistent (`resid`)** IDs  to identify molecule boundaries. This is the default behavior for GROMACS `.gro` output.
 
 For example:
-| Correct format       | Wrong format         |
-|----------------------|----------------------|
-|    1H2O  OICE1 ...   |    1H2O  OICE1 ...   |
-|    1H2O  HICE1 ...   |    1H2O  HICE2 ...   |
-|    1H2O  HICE1 ...   |    1H2O  HICE3 ...   |
-|    2H2O  OICE1 ...   |    1H2O  OICE1 ...   |
-|    2H2O  HICE2 ...   |    1H2O  HICE2 ...   |
-|    2H2O  HICE3 ...   |    1H2O  HICE3 ...   |
-|    3H2O  OICE1 ...   |    1H2O  OICE1 ...   |
-|    ...               |    ...               |
+| Correct format        | Wrong format          |
+|-----------------------|-----------------------|
+|    1H2O   OICE  ...   |    1H2O   OICE  ...   |
+|    1H2O   HICE  ...   |    1H2O   HICE  ...   |
+|    1H2O   HICE  ...   |    1H2O   HICE  ...   |
+|    2H2O   OICE  ...   |    1H2O   OICE  ...   |
+|    2H2O   HICE  ...   |    1H2O   HICE  ...   |
+|    2H2O   HICE  ...   |    1H2O   HICE  ...   |
+|    3H2O   OICE  ...   |    1H2O   OICE  ...   |
+|    ...                |    ...                |
 
 ### 3.1 H₂O file 
 
@@ -104,7 +99,14 @@ For example:
   - **O**       : 1-point water  
   - **OHH**     : 3-point water  
   - **OHHM**    : 4-point water  
-  - **OHHLL**   : 5-point water  
+  - **OHHLL**   : 5-point water
+    
+For example:
+| Correct format       | Wrong format         | Wrong format         |
+|----------------------|----------------------|----------------------|
+|    1H2O   OICE ...   |    1H2O   HICE ...   |   1H2O   HICE ...    |
+|    1H2O   HICE ...   |    1H2O   OICE ...   |   1H2O   HICE ...    |
+|    1H2O   HICE ...   |    1H2O   HICE ...   |   1H2O   OICE ...    |
 
 > *Note: Dummy atoms (if any) will be ignored.*
 > *If hydrogen atoms (H1, H2) are present, hydrogen bonds and bond angles will be considered; otherwise, these features are disabled.*
@@ -115,4 +117,59 @@ For example:
 - To include multiple guest molecule types (e.g., CO₂, CH₄), extract a single representative atom per molecule (such as the carbon atom for CO₂ and CH₄) to serve as the molecule’s center point.
 - Use `make_ndx` to create index groups for each guest type, then use `trjconv` to extract these single-point representations and merge them into a single `.gro` file for processing by TRACE.
 
+### 3.3 Additive Hydrogen Bond Definition File
 
+TRACE allows users to define custom hydrogen bonds between additive and water molecules by providing an external file via the `-h` option.
+
+Each hydrogen bond entry must start with `!` and follow the format:
+`! donor_type acceptor_type donor_atom_index acceptor_atom_index donor_H_atom_index theta_cutoff`
+Where:
+- `donor_type`, `acceptor_type`: either `w` (water) or `a` (additive)  
+- `donor_atom_index`, `acceptor_atom_index`, and `donor_H_atom_index`: indices according to the `.gro` file  
+- `theta_cutoff`: angular cutoff in degrees  
+- The order of entries does not affect the outcome
+
+Atom indices **must match the order in the `.gro` file**. For example, water must be ordered as `O H1 H2 ...`, and the additive atoms should follow their appearance in the file.  
+
+For example:
+|  H2O.gro example          |
+|---------------------------|
+|    1H2O  OICE1    1 ...   | 
+|    1H2O  HICE2    2 ...   | 
+|    1H2O  HICE3    3 ...   |
+|    2H2O  OICE1    4 ...   |
+|    ...                    |
+
+For urea example:
+|  Urea.gro example         |
+|---------------------------|
+|    1Urea    C1    1...    |  
+|    1Urea    O2    2 ...   | 
+|    1Urea    N3    3...    |
+|    1Urea    N4    4...    |  
+|    1Urea    H5    5 ...   | 
+|    1Urea    H6    6...    |
+|    1Urea    H7    7...    |  
+|    1Urea    H8    8 ...   | 
+|    2Urea    C1    9 ...   |
+|    ...                    |
+
+#### Sample content of `hbond_urea.txt`
+<pre>
+# water-additive interaction
+! w a 0 1 1 35 #OICE1(0)-O2(1)-HICE2(1)
+! w a 0 1 2 35 #OICE1(0)-O2(1)-HICE3(2)
+! a w 2 0 4 35 #N3(2)-OICE1(0)-H5(4)
+! a w 2 0 5 35 #N3(2)-OICE1(0)-H6(5)
+! a w 3 0 6 35 #N4(3)-OICE1(0)-H7(6)
+! a w 3 0 7 35 #N4(3)-OICE1(0)-H8(7)
+
+# additive-additive interaction
+! a a 2 1 4 35 #N3(2)-O2(1)-H5(4)
+! a a 2 1 5 35 #N3(2)-O2(1)-H6(5)
+! a a 3 1 6 35 #N4(3)-O2(1)-H7(6)
+! a a 3 1 7 35 #N4(3)-O2(1)-H8(7)
+</pre>
+
+> 💡 **Note:** water–water hydrogen bonds are built-in and do not need to be listed.
+You can refer to the provided [`hbond_urea.txt`](./example/hbond_urea.txt) file for a complete working example.
