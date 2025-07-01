@@ -50,11 +50,11 @@ TRACE automatically adjusts computation based on the input files provided. Some 
 
 `/path/to/TRACE/TRACE.exe -w example_H2O.gro -g example_guest.gro -a example_urea.gro -h hbond_urea.txt`
 
-**Note:** See [Section 3: File Format](#3-file-format) for details on file structure.
+> *Note: See [Section 3: File Format](#3-file-format) for details on file structure.*
 
-**Note:** We generate a total of 9 output files for analysis.  
-All output files are saved by default in the current working directory.  
-The output file names are fixed (non-randomized), so please be careful to avoid overwriting existing files.
+> *Note We generate a total of 9 output files for analysis.*  
+> *All output files are saved by default in the current working directory.* 
+> *The output file names are fixed (non-randomized), so please be careful to avoid overwriting existing files.*
 
 For detailed information, see Section 5. Output Files and Analysis.
 
@@ -66,7 +66,7 @@ Once installed, launch VMD from the terminal:
 
 `vmd`
 
-In the VMD Tk Console, run the following command to load the visualization script:
+In the VMD Tk Console, run the following command to load the visualization script [`visualize.tcl`](./visualize.tcl):
 
 `source /path/to/TRACE/visualize.tcl`
 
@@ -292,3 +292,70 @@ while additive molecule indices range from `Nw + 1` to `Nw + Na`.)
 
 > Although .gro files wrap residue IDs and atom numbers beyond 99999 due to fixed-width formatting, TRACE internally assigns unique sequential molecule indices based on input order. This ensures that each water, guest, and additive molecule has a unique and consistent identifier throughout the analysis.  
 > All indices refer to the **input sequence order**, not `.gro` residue IDs.
+
+### 5.3 `visual.gro`
+
+Generates a `.gro` file for visualization in VMD.
+
+### 5.4 `visual_index.txt`
+
+Generates an index file used for coloring in VMD.
+
+For usage details, please refer to Section 2.4: Visualization with VMD.
+
+### 5.5 `occupancy.txt`
+
+This file records the total number of cages (SEC, non-SEC, IC combined) and the number of cages occupied by guest molecules per frame. It also reports the vacancy rate (`vac`), defined as: vac = 1 - (ALL_F / ALL)
+
+### 5.6 `cluster.txt`
+
+This file records cage clusters for each frame, sorted from largest to smallest cluster size.
+
+Format example:
+#Frame cluster 1 (size) ... cluster n (size)
+0 11 4 3 2 1 1
+1 13 4 2 2 1 1 1 1 1
+2 13 6 6 1 1 1 1
+
+- Each number after the frame index represents the size of a cage cluster.  
+- Cage clusters are defined by cages sharing polygonal faces and grouped as one cluster.
+
+### 5.7 `crystallinity.txt`
+
+Records how many cages (SECs + non-SECs + IC) each molecule (water or additive) participates in per frame, along with the average crystallinity.
+
+Example format:
+
+#frame 1H2O ... nH2O ... nadd Crystallinity
+1 4 3 4 ... 4 3.750
+2 4 4 4 ... 3 3.750
+3 4 4 4 ... 4 4.000
+...
+
+- `1:H2O ... Nw:H2O`: indices of water molecules from 1 to Nw  
+- `Na:add`: additive molecule indices from Nw+1 to Nw+Na 
+- `Crystallinity`: average number of cages each molecule participates in
+
+### 5.8 `ring.txt`
+
+Records how many 4-, 5-, and 6-membered rings each molecule (water or additive) participates in per frame.
+
+Example format:
+#frame 1:H2O ... Nw:H2O ... Na:add (4r,5r,6r per molecule)
+1 2,4,5 1,0,6 ... 4,0,0
+2 4,5,2 2,1,2 ... 3,2,3
+...
+
+### 5.9 `ring_detail.txt`
+
+Records the molecular composition of each ring in each frame. Molecule indices range from `1` to `Nw + Na` (water and additive molecules).
+
+Each line corresponds to one ring:
+```plaintext
+[ 1 167 178 181 297 ]
+```
+This means the ring is formed by molecules with indices `1, 167, 178, 181, 297`, connected by hydrogen bonds in the following sequence:
+
+1–167, 167–178, 178–181, 181–297, 297–1
+
+- Each ring is assumed to form a closed loop based on hydrogen bonding order.
