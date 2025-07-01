@@ -284,7 +284,7 @@ SEC: 10
 NSEC: 0
 IC: 12
 ```
-This indicates the total number of 4- to 10-membered rings, cup and cage structures found across the trajectory.
+This indicates the total number of 4- to n-membered rings, cup and cage structures found across the trajectory.
 
 Each cage includes a summary of its geometry properties. For example:
 
