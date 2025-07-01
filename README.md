@@ -243,11 +243,11 @@ File names are fixed and will be overwritten if they already exist — please ba
 | `cage.txt`             | Summary of all cage types detected per frame. |
 | `detail_cage.txt`      | Detailed topology and molecule membership for each cage. |
 | `visual.gro`           | Structure file for visualizing cages in VMD. |
-| `visual_index.txt`     | Cage-type index for coloring atoms in VMD (used with `visualize.tcl`). |
+| `visual_index.txt`     | Cage-type index for coloring atoms in VMD [`visualize.tcl`](./visualize.tcl). |
 | `occupancy.txt`        | Frame-by-frame guest molecule occupancy per cage. |
-| `cluster.txt`          | Cage cluster membership and statistics. |
-| `crystallinity.txt`    | Crystallinity metric of the system over time. |
-| `ring.txt`             | Total number of n-membered rings in each frame. |
+| `cluster.txt`          | Cage cluster statistics per frame. |
+| `crystallinity.txt`    | Number of cages each molecule participates in per frame and average system crystallinity |
+| `ring.txt`             | Number of 4-, 5-, and 6-membered rings each molecule participates in per frame. |
 | `ring_detail.txt`      | Complete list of all individual rings detected and their constituent molecules. |
 
 ---
