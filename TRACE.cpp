@@ -2515,7 +2515,7 @@ void cage::output_visual(int i,const vector<polyhedron> &SEC_cage,const vector<p
 	}
 	//guest
 	if(cal_guest){
-		atom_name="g";
+		atom_name="C";
         	type="guest";
 		for (int j = 0; j < guest; j++) {
 			int id1 = j + 1;
