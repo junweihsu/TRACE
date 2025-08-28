@@ -46,7 +46,7 @@ This tool was developed as part of an academic study on hydrate formation dynami
 
 Clone the repository to your desired directory (replace `/path/to/TRACE` with your chosen path):
 
-`git clone https://github.com/qwe88866/TRACE.git /path/to/TRACE`
+`git clone https://github.com/junweihsu/TRACE.git /path/to/TRACE`
 
 ### 2.2 Compile the program
 
@@ -87,17 +87,19 @@ For detailed information, see Section 5. Output Files and Analysis.
 
 To visualize the results, you need to install VMD (Visual Molecular Dynamics).
 
-Once installed, launch VMD from the terminal:
-
-`vmd`
-
-In the VMD Tk Console, run the following command to load the visualization script [`visualize.tcl`](./visualize.tcl):
-
-`source /path/to/TRACE/visualize.tcl`
-
 Make sure you are already in the analysis output directory that contains `visual.gro` and `visual_index.txt`, and that the analysis has been completed.
 
-> By default, the script assumes the required files are in the current working directory (`./`).
+Once installed and the analysis is complete, launch VMD from the terminal:
+
+`vmd -e /path/to/TRACE/visualize.tcl`
+
+> By default, the script [`visualize.tcl`](./visualize.tcl) assumes the required files are in the current working directory (`./`).
+
+![TRACE VMD Visualization](TRACE_VMD.png)
+
+>**Note:** For the five selected representations, make sure to check **Update Selection Every Frame** and **Update Color Every Frame**.
+
+![TRACE Visual Example](TRACE-visual.PNG)
 
 ## 3. File Format
 
@@ -109,6 +111,8 @@ For details on the `.gro` file format used by TRACE, please refer to the officia
 
 Because the program does **not** require users to input the number of atoms per molecule (e.g., for H2O, guest, additive),  
 it relies on **sequential and consistent (`resid`)** IDs  to identify molecule boundaries. This is the default behavior for GROMACS `.gro` output.
+
+Be aware that errors may occur if the `.gro` file has been manually edited or converted from LAMMPS trajectories. In particular, note the unit differences: LAMMPS uses Ångström (Å), whereas GROMACS uses nanometers (nm).
 
 For example:
 | Correct format        | Correct format        | Wrong format          | Correct format        | Correct format        |
@@ -253,9 +257,9 @@ Only the `-w` option is required; all others are optional.
 | `-e`    | `2000`          | Ending frame index |
 | `-si`   | `10`            | Frame shift interval (default: `0`) |
 | `-r`    | `0.36`          | H-bond O–O cutoff distance in nm (default: `0.36`) |
-| `-th`   | `35`            | H-bond angle (O–O–H) threshold in degrees (default: `35`; use `< 0` to disable angle check) |
+| `-th`   | `35`            | H-bond angle (O···O–H) threshold in degrees (default: `35`; use `< 0` to disable angle check) |
 | `-DA`   | `90`            | Dihedral angle tolerance (default: `90°`) |
-| `-IA`   | `20`            | Interior angle tolerance for rings ≥7 (default: `20°`; should be < 30) |
+| `-IA`   | `20`            | Interior angle tolerance for rings ≥7 (default: `20°`; **Recommendation:** Keep below 25° to avoid missing cages. ) |
 | `-mr`   | `10`             | Maximum ring size to detect (6–12; default: `10`) |
 | `-cl`   | `yes` / `no`    | Include incomplete cages in cluster detection (default: `yes`) |
 | `-nb`   | `4 4 4`         | Number of sub-boxes in `x y z` (default: box length / 1.2 nm, rounded) |
@@ -317,7 +321,7 @@ This indicates the total number of 4- to n-membered rings, cup and cage structur
 Each cage includes a summary of its geometry properties. For example:
 
 ```plaintext
-#cage8 1 Type: 5(12)6(2) t: 72 F: 14 E: 36 V:24
+#cage 1 Type: 5(12)6(2) t: 72 F: 14 E: 36 V:24
  CP [ 2.062 1.146 6.043 ]
  V [ 8 97 107 318 453 602 669 752 853 1120 1122 1494 1660 1688 1982 2167 2238 2421 2514 2594 2718 2824 2936 2983 ]
  g [ 1444 ]
@@ -364,7 +368,7 @@ For usage details, please refer to [2.4 Visualization with VMD](#24-visualizatio
 
 ### 5.5 occupancy.txt
 
-This file records the total number of cages (SEC, non-SEC, IC combined) and the number of cages occupied by guest molecules per frame. It also reports the vacancy rate (`vac`), defined as: vac = 1 - (ALL_F / ALL)
+This file records the total number of cages (SEC, non-SEC, IC combined) and the number of cages occupied by guest molecules per frame. It also reports the occupancy rate (`occ`), occ is the occupacy rate for all cages, SECs, non-SECs or ICs. Example: ALL_F / ALL.
 
 ### 5.6 cluster.txt
 
@@ -388,7 +392,7 @@ Format example:
 
 ### 5.7 crystallinity.txt
 
-Records how many cages (SECs + non-SECs + IC) each molecule (water or additive) participates in per frame, along with the average crystallinity.
+Records how many cages (SECs + non-SECs + IC) each molecule (water or additive) participates in per frame, along with the crystallinity index.
 
 Example format:
 
