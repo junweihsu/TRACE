@@ -95,7 +95,7 @@ Once installed and the analysis is complete, launch VMD from the terminal:
 
 > By default, the script [`visualize.tcl`](./visualize.tcl) assumes the required files are in the current working directory (`./`).
 
-![TRACE VMD Visualization](TRACE_VMD.png)
+<img src="TRACE_VMD.png" alt="TRACE VMD Visualization" width="400">
 
 >**Note:** For the five selected representations, make sure to check **Update Selection Every Frame** and **Update Color Every Frame**.
 
