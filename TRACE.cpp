@@ -126,9 +126,9 @@ public:
 	//function
 	void build_grid();
 	//input and output function
-	void input_guest(int atom_number,point *molecule,int molecule_num);//input geust molecule
+	bool input_guest(int atom_number,point *molecule,int molecule_num);//input geust molecule
 	bool input_H2O(int atom_number,point **molecule,int molecule_num);//input all molecule information of H2O (all atom)
-	void input_add(int atom_number,point **molecule,int molecule_num);
+	bool input_add(int atom_number,point **molecule,int molecule_num);
 	bool input_hbond();
 	void cal_and_output(int i);
 	void print1D(vector<int> vec);
@@ -136,10 +136,10 @@ public:
 	void printP(polyhedron p,ofstream& ofs_summary);
 	void printP2(polyhedron p);
 	void write_ring_summary(int i);
-	void classify_and_process_cages(int i,int& fill,vector<polyhedron> &cage,vector<polyhedron> &SEC_cage,vector<polyhedron> &non_SEC_cage,vector<polyhedron> &IC_cage,vector<int> &cage_form);
+	void classify_and_process_cages(int i,int& fill,int& fill_SEC,int& fill_nSEC,int& fill_IC,vector<polyhedron> &cage,vector<polyhedron> &SEC_cage,vector<polyhedron> &non_SEC_cage,vector<polyhedron> &IC_cage,vector<int> &cage_form);
 	void process_and_write_clusters(int i,const vector<polyhedron> &SEC_cage,const vector<polyhedron> &non_SEC_cage,const vector<polyhedron> &IC_cage);
 	void write_cage_details(const int& i,const vector<int> &cage_form,const vector<polyhedron> &SEC_cage,const vector<polyhedron> &non_SEC_cage,const vector<polyhedron> &IC_cage);
-	void write_cage_summary(int& i,int& fill,int& SEC_cage_size, int& non_SEC_cage_size, int& IC_cage_size);	
+	void write_cage_summary(int& i,int& fill,int& fill_SEC,int& fill_nSEC,int& fill_IC,int& SEC_cage_size, int& non_SEC_cage_size, int& IC_cage_size);	
 	void output_visual(int i,const vector<polyhedron> &SEC_cage,const vector<polyhedron> &non_SEC_cage,const vector<polyhedron> &IC_cage);
 	//function of calulation
 	double PBC_dist(point a,point b);//cal the distance between a molecule and b in pbc
@@ -162,13 +162,13 @@ public:
 	bool share_edge(const vector<pair<int,int> >& vec1, const vector<pair<int,int> >& vec2);
 	void find_cage(vector<polyhedron*>& cup_group,vector<polyhedron>& cage,unordered_map<vector<int>, vector<polyhedron*> *, VectorHash>& grouped,int& type);
 	//find cage cluster
-        void built_cage_matrix(vector<polyhedron>& ALLcage);
+        void build_cage_matrix(vector<polyhedron>& ALLcage);
 	void cage_dfs(int i, vector<int>& cluster, vector<int>& visited);
 	void find_cluster(vector<vector<int> >& groups,const int& n);
 	//other function
 	string intToString(int number);
-	void built_hbond_map();
-	void define_cage(polyhedron &P,int iframe,int perfect,int &fill);
+	void build_hbond_map();
+	void define_cage(polyhedron &P,int iframe,int perfect,int &fill,int &fill_type);
 	string mapToString(const map<int, int>& face_count);
         int SEC_cage_identify(polyhedron &P);
         point cross_product(point v1, point v2);
@@ -263,7 +263,7 @@ int main(int argc, char* argv[])
 		<< "\033[0m" << endl;
 		cout << "\033[33m";
 		cout << "(Required parameter)\n"
-		<< "-w   Ex: H2O.gro              H2O file\n"
+		<< "-w   Ex: H2O.gro                    H2O file\n"
 		<< "\033[0m" << endl;
 		cout << "\033[32m(Optional parameters)\n"
 		<< "-g   Ex: CO2.gro                    Guest molecule file\n"
@@ -478,10 +478,10 @@ int main(int argc, char* argv[])
 		cerr<<"\033[1;31m"<<"-mr The maximum size of n-membered rings to be considered in the calculations (valid input range: 6–12)."<< "\033[0m"<<endl;	
 		return 0;
 	}
-	if(cage.IA_tolerance>30){
+	/*if(cage.IA_tolerance>30){
 		cerr<<"\033[1;31m"<<"Error: IA tolerance must not exceed 30°."<< "\033[0m"<<endl;
 		cage.IA_tolerance=30;
-	}
+	}*/
 	cout<<"\nHbond criteria:\n  rcut:              "<<cage.rcut<<" nm\n  angle threshold:   "<<cage.theta<<"°"<<endl;
         cout<<"  DA tolerance:      "<<cage.DA_tolerance<<"°"<<endl;
 	cout<<"  IA tolerance:      " << cage.IA_tolerance << "° (applied to rings with size >= 7)" << endl;
@@ -521,8 +521,8 @@ int main(int argc, char* argv[])
 		cage.ifs_guest.open(Guest_filename.c_str());
 		cage.ofs_occupancy.open(fname_occupancy.c_str());
 		cage.ofs_occupancy<<"#ALL represents the total number of SEC, non-SEC, and IC types; ALL_F is the number of those filled by guests.";
-		cage.ofs_occupancy<<"\n#vac is the vacancy rate, defined as 1 - (ALL_F / ALL)."<<endl;
-                cage.ofs_occupancy<<"#Frame  vac     ALL     ALL_F   "<<endl;
+		cage.ofs_occupancy<<"\n#occ is the occupacy rate for all cages, SECs, non-SECs or ICs. Example: ALL_F / ALL."<<endl;
+                cage.ofs_occupancy<<"#Frame  occ     ALL     ALL_F   occ     SEC     SEC_F   occ     nSEC    nSEC_F  occ     ICs     ICs_F   "<<endl;
         }
 		//open all file
         cage.ofs_summary<<"#Cage type format ==> example: 4(1)5(10)6(2)==> 1,10,2 (Shows only some common SECs)"<<endl;
@@ -534,34 +534,41 @@ int main(int argc, char* argv[])
 	cage.ofs_crystallinity<<"#frame 1:H2O ... Nw:H2O ... Na:add  Crystallinity (The number of cages each molecule participates)"<<endl;
         cage.ofs_ring_count<<"#frame 1:H2O ... Nw:H2O ... Na:add (The number of 4rings,5rings,6rings each molecule participates)"<<endl;
         cout<<"Start the calculation ..."<<endl;
-	bool end=true;
+	bool terminate=true;
 	int i=0;//frame index
 	//shift frame
 	i+=shift_frame;cage.initial_frame+=shift_frame;cage.end_frame+=shift_frame;
-	timespec start, eend;
-	clock_gettime(CLOCK_MONOTONIC, &start);
-	while(1){
-		if(i>cage.end_frame)break;
-		end=cage.input_H2O(cage.H2O_atom,cage.H2O_molecule,cage.H2O);
-		if(end)break;
-		if(cage.cal_additive){
-        		cage.input_add(cage.add_atom,cage.add_molecule,cage.add);
+	timespec start_whole, end_whole;
+        clock_gettime(CLOCK_MONOTONIC, &start_whole);
+        while(1){
+                timespec start_per_frame, end_per_frame;
+                clock_gettime(CLOCK_MONOTONIC, &start_per_frame);
+                if (i>cage.end_frame) break;
+                terminate=cage.input_H2O(cage.H2O_atom,cage.H2O_molecule,cage.H2O);
+                if (terminate) break;
+                if (cage.cal_additive){
+                        terminate=cage.input_add(cage.add_atom,cage.add_molecule,cage.add);
+                	if(terminate) break;
 		}
-        	if(cage.cal_guest)
-                	cage.input_guest(cage.guest_atom,cage.guest_molecule,cage.guest);
-		if(i>=cage.initial_frame){
-			cage.build_grid();
-			cage.cal_and_output(i);
+                if (cage.cal_guest) {
+                        terminate=cage.input_guest(cage.guest_atom,cage.guest_molecule,cage.guest);
+                	if(terminate) break;
 		}
-		else{
-                        //cout<<"Skip frame "<<i<<"..."<<endl;
+		if (i>=cage.initial_frame) {
+                        cage.build_grid();
+                        cage.cal_and_output(i);
+                }
+                else{
+                        cout<<"Skip frame "<<i<<"..."<<endl;
                         i++;
                         continue;
-                }	
-		i++;
-	}
-	clock_gettime(CLOCK_MONOTONIC, &eend);
-        cout << "Time consumed: " << get_elapsed_time(start, eend) << " sec" << endl;
+                }
+		clock_gettime(CLOCK_MONOTONIC, &end_per_frame);
+                cout << fixed << setprecision(3) << get_elapsed_time(start_per_frame, end_per_frame) << " s" << endl;
+                i++;
+        }
+        clock_gettime(CLOCK_MONOTONIC, &end_whole);
+        cout << fixed << setprecision(3) << "Total time consumed: " << get_elapsed_time(start_whole, end_whole) << " s" << endl;
 	cage.ifs_water.close();
         cage.ifs_guest.close();
         cage.ifs_add.close();
@@ -1537,7 +1544,7 @@ double cage::PBC_angle(point a,point b,point c){
 	return acos((v1.x*v2.x + v1.y*v2.y + v1.z*v2.z) / sqrt( (v1.x*v1.x + v1.y*v1.y + v1.z*v1.z) * (v2.x*v2.x + v2.y*v2.y + v2.z*v2.z) ) )*(180.0 / M_PI);
 }
 //=============================other function=====================================================================
-void cage::built_hbond_map() {
+void cage::build_hbond_map() {
 	double distance;
 	bool Hbond;
         hbond hb;
@@ -1721,7 +1728,7 @@ pair<bool,int> cage::define_molecule(string *type, int *atom_number,string filen
 	return result;
 }
 //=============================function of output and input====================================================
-void cage::input_guest(int atom_number,point *molecule,int molecule_num) {
+bool cage::input_guest(int atom_number,point *molecule,int molecule_num) {
 	string line, junk;
 	//cout<<"Wait for reading guest.gro ..."<<endl;
 	getline(ifs_guest, line);getline(ifs_guest, line);
@@ -1744,8 +1751,10 @@ void cage::input_guest(int atom_number,point *molecule,int molecule_num) {
 	}
 	if (!(ifs_guest >> junk >> junk >> junk)) {
                 cerr << "\033[31mError: Failed to read box vector. Possible malformed .gro(guest) file at end.\033[0m" << endl;
-        }
+        	return true;
+	}
 	ifs_guest.ignore(numeric_limits<streamsize>::max(), '\n');
+	return false;	
 }
 bool cage::input_H2O(int atom_number,point **molecule,int molecule_num) {
         string line, junk;
@@ -1776,7 +1785,7 @@ bool cage::input_H2O(int atom_number,point **molecule,int molecule_num) {
 	ifs_water.ignore(numeric_limits<streamsize>::max(), '\n');
 	return false;
 }
-void cage::input_add(int atom_number,point **molecule,int molecule_num) {
+bool cage::input_add(int atom_number,point **molecule,int molecule_num) {
         string line, junk;
 	getline(ifs_add, line);getline(ifs_add, line);
 	for (int j = 0; j < molecule_num; j++) {
@@ -1790,8 +1799,10 @@ void cage::input_add(int atom_number,point **molecule,int molecule_num) {
 	}
 	if (!(ifs_add >> junk >> junk >> junk)) {
 		cerr << "\033[31mError: Failed to read box vector. Possible malformed .gro(additive) file at end.\033[0m" << endl;
+		return true;
 	}
 	ifs_add.ignore(numeric_limits<streamsize>::max(), '\n');
+	return false;
 }
 bool cage::input_hbond() {
 	string line;
@@ -1970,7 +1981,7 @@ int cage::SEC_cage_identify(polyhedron &P){
 	return 2;
 }
 //find cage cluster
-void cage::built_cage_matrix(vector<polyhedron>& ALLcage){
+void cage::build_cage_matrix(vector<polyhedron>& ALLcage){
         size_t size = ALLcage.size();
 	unordered_map< vector<int>, vector<int>, VectorHash > face_to_cage;
 	for (int i = 0; i < (int)size; ++i) {
@@ -2035,7 +2046,7 @@ struct PolyhedronAllCompare {
 //output function
 void cage::cal_and_output(int i){
 	timespec start, end;
-	cout<<"Current frame "<<i<<" ..."<<endl;	
+	cout<<"Current frame "<<i<<" ...  ";	
 	ofs_detail<<"Frame: "<<i<<endl;
 	ofs_ring_detail<<"Frame: "<<i<<endl;
 	//reset parameter
@@ -2046,8 +2057,8 @@ void cage::cal_and_output(int i){
 	if(cal_guest)
                 fill(isguest.begin(), isguest.end(), 0);
 	fill(H2O_color.begin(), H2O_color.end() ,10);
-	//==============================built H-bond map===============================
-	built_hbond_map();
+	//==============================build H-bond map===============================
+	build_hbond_map();
 	//==============================find ring======================================
 	find_ring();
 	__gnu_parallel::sort(allring.begin(), allring.end(), RingALLCompare());
@@ -2068,18 +2079,18 @@ void cage::cal_and_output(int i){
 	ofs_detail<<"cup: "<<cup_group.size()<<endl;
 	//==============================find cage======================================
 	vector<int> cage_form(H2O + add, 0);
-	int fill=0; 
+	int fill = 0, fill_SEC = 0, fill_nSEC = 0, fill_IC = 0;
 	vector<polyhedron> cage,SEC_cage,IC_cage,non_SEC_cage;
 	int type=0;//type=0 find complete cage, type=2 find IC (distort tolerance T+2)
 	find_cage(cup_group,cage,cup_grouped,type);//Find SECs and non-SECs
 	type=2;
 	find_cage(cup_group,cage,cup_grouped,type);//Find ICs
-	classify_and_process_cages(i, fill, cage, SEC_cage, non_SEC_cage, IC_cage, cage_form);		
+	classify_and_process_cages(i, fill, fill_SEC, fill_nSEC, fill_IC, cage, SEC_cage, non_SEC_cage, IC_cage, cage_form);		
 	process_and_write_clusters(i,SEC_cage,non_SEC_cage,IC_cage);
 	output_visual(i,SEC_cage,non_SEC_cage,IC_cage);
 	int sec_size = SEC_cage.size(),non_sec_size = non_SEC_cage.size(),ic_size = IC_cage.size();
 	write_cage_details(i,cage_form, SEC_cage, non_SEC_cage, IC_cage);
-	write_cage_summary(i,fill, sec_size, non_sec_size, ic_size);
+	write_cage_summary(i, fill, fill_SEC, fill_nSEC, fill_IC, sec_size, non_sec_size, ic_size);
 	//=================================release memory=============================
 	for (size_t j = 0; j < cup_group.size(); ++j)
 		delete cup_group[j];
@@ -2154,7 +2165,7 @@ void cage::print2D(vector<vector<int> > v){
         }
 	cout<<" ]"<<endl;
 }
-void cage::define_cage(polyhedron &P,int frame,int perfect,int &fill){
+void cage::define_cage(polyhedron &P,int frame,int perfect,int &fill,int& fill_type){
 	//define the cage type
 	map<int, int> face_counts;
 	double d_from_cp;
@@ -2162,7 +2173,7 @@ void cage::define_cage(polyhedron &P,int frame,int perfect,int &fill){
 	for(int l=0;l<face_size;l++)
 		face_counts[P.face[l].size()]++;
 	P.type=mapToString(face_counts);
-	//built the neighbor additive list for every cage
+	//build the neighbor additive list for every cage
 	P.cp=PBC_average_P(P);
 	if(cal_guest){
 		if (face_size > 16)
@@ -2204,8 +2215,10 @@ void cage::define_cage(polyhedron &P,int frame,int perfect,int &fill){
 						break;
 				}
 			}
-			if(filled)
+			if(filled){
 				fill++;
+				fill_type++;
+			}
 		}		   
 		if (P.type == "5(12)") {
 			cage512++;
@@ -2260,6 +2273,7 @@ void cage::define_cage(polyhedron &P,int frame,int perfect,int &fill){
 			P.color_tier=7;
 		} else {
 			other++;
+			//cout<<P.type<<endl;
 			P.color_tier=7;
 		}
 	}
@@ -2269,16 +2283,21 @@ void cage::define_cage(polyhedron &P,int frame,int perfect,int &fill){
 		else
 			P.color_tier=8;
                 if(cal_guest){
+			bool filled=false;
                         for(int l=0;l<guest;l++){
 				if(isguest[l])continue;
                                 if(PBC_dist(P.cp,guest_molecule[l])<d_from_cp){
-					fill++;
+					filled=true;
 					P.guest_idx.push_back(l+1);
 					isguest[l]=1;
 					if(face_size<=16)
                                                 break;
                                 }
                         }
+			if(filled){
+                                fill++;
+				fill_type++;
+			}
                 }
         }
 	/*cout<<P.type<<" F: "<<P.face.size()<<" V: "<<P.vertex.size()<<endl;	
@@ -2331,6 +2350,7 @@ void cage::write_ring_summary(int i){
 	ofs_ring_count << i << " ";
 	for (int j = 0; j < H2O + add; ++j)
 		ofs_ring_count << ring4_form[j] << "," << ring5_form[j] << "," << ring6_form[j] << " ";
+	ofs_ring_count<<endl;
 	for (int j = 4; j <= max_ring + 1; ++j)
 		ofs_detail << j << "r: " << ring_count[j] << endl;
 		//ofs_detail << j << "r: " << ring_count[j] - aring_count[j] << endl;
@@ -2339,34 +2359,49 @@ void cage::write_ring_summary(int i){
                         ofs_detail << j << "ar: " << aring_count[j] << endl;
 	}*/
 }
-void cage::classify_and_process_cages(int i,int& fill,vector<polyhedron> &cage,vector<polyhedron> &SEC_cage,vector<polyhedron> &non_SEC_cage,vector<polyhedron> &IC_cage,vector<int> &cage_form) {
+void cage::classify_and_process_cages(int i,int& fill,int& fill_SEC,int& fill_nSEC,int& fill_IC, vector<polyhedron> &cage,vector<polyhedron> &SEC_cage,vector<polyhedron> &non_SEC_cage,vector<polyhedron> &IC_cage,vector<int> &cage_form) {
 	size_t cagesize = cage.size();
+	size_t a_SEC=0,a_non_SEC=0,a_IC=0;
 	for (size_t j = 0; j < cagesize; ++j) {
-		if (cage[j].perfect == 2)
+		if (cage[j].perfect == 2){
 			SEC_cage.push_back(cage[j]);
-		else if (cage[j].perfect == 0)
+			if(cage[j].vertex.back()>=H2O)
+				a_SEC++;
+		}
+		else if (cage[j].perfect == 0){
 			IC_cage.push_back(cage[j]);
-		else if (cage[j].perfect == 1)
+			if(cage[j].vertex.back()>=H2O)
+                                a_IC++;
+		}
+		else if (cage[j].perfect == 1){
 			non_SEC_cage.push_back(cage[j]);
+			if(cage[j].vertex.back()>=H2O)
+                                a_non_SEC++;
+		}
 	}
 	cage.clear();
-	ofs_detail << "SEC: " << SEC_cage.size() << endl;
-	ofs_detail << "NSEC: " << non_SEC_cage.size() << endl;
-	ofs_detail << "IC: " << IC_cage.size() << endl;
+	ofs_detail << "SEC: " << SEC_cage.size() - a_SEC << endl;
+        ofs_detail << "NSEC: " << non_SEC_cage.size() - a_non_SEC << endl;
+        ofs_detail << "IC: " << IC_cage.size() - a_IC << endl;
+	if(cal_additive){
+		ofs_detail << "a-SEC: " << a_SEC << endl;
+		ofs_detail << "a-NSEC: " << a_non_SEC << endl;
+		ofs_detail << "a-IC: " << a_IC << endl;
+	}
 	for (size_t j = 0; j < SEC_cage.size(); ++j) {
-		define_cage(SEC_cage[j], i, SEC_cage[j].perfect, fill);
+		define_cage(SEC_cage[j], i, SEC_cage[j].perfect, fill, fill_SEC);
 		for (size_t k = 0; k < SEC_cage[j].vertex.size(); ++k)
 			cage_form[SEC_cage[j].vertex[k]]++;
 		// printP2(SEC_cage[j]);
 	}
 	for (size_t j = 0; j < non_SEC_cage.size(); ++j) {
-		define_cage(non_SEC_cage[j], i, non_SEC_cage[j].perfect, fill);
+		define_cage(non_SEC_cage[j], i, non_SEC_cage[j].perfect, fill, fill_nSEC);
 		for (size_t k = 0; k < non_SEC_cage[j].vertex.size(); ++k)
 			cage_form[non_SEC_cage[j].vertex[k]]++;
 		// printP2(non_SEC_cage[j]);
 	}
 	for (size_t j = 0; j < IC_cage.size(); ++j) {
-		define_cage(IC_cage[j], i, IC_cage[j].perfect, fill);
+		define_cage(IC_cage[j], i, IC_cage[j].perfect, fill, fill_IC);
 		for (size_t k = 0; k < IC_cage[j].vertex.size(); ++k)
 			cage_form[IC_cage[j].vertex[k]]++;
 		// printP2(IC_cage[j]);
@@ -2382,7 +2417,7 @@ void cage::process_and_write_clusters(int i,const vector<polyhedron> &SEC_cage,c
 	if (cl == "yes")
 		ALLcage.insert(ALLcage.end(), IC_cage.begin(), IC_cage.end());
 	cage_adjlist.resize(ALLcage.size());
-	built_cage_matrix(ALLcage);
+	build_cage_matrix(ALLcage);
 	vector<vector<int>> groups;
 	find_cluster(groups, ALLcage.size());
 	ofs_cluster << i << " ";
@@ -2409,27 +2444,27 @@ void cage::write_cage_details(const int& i,const vector<int> &cage_form,const ve
 		ofs_detail << "=========================SECs=========================" << endl;
 	for (size_t j = 0; j < SEC_cage.size(); ++j) {
 		if (SEC_cage[j].vertex.back() < H2O)
-			ofs_detail << "#cage" << j + 1 << " ";
+			ofs_detail << "#cage" << " ";
 		else
-			ofs_detail << "#a-cage" << j + 1 << " ";
+			ofs_detail << "#a-cage" << " ";
 		printP(SEC_cage[j], ofs_detail);
 	}
 	if (non_SEC_cage.size() > 0)
 		ofs_detail << "=========================non-SECs=========================" << endl;
 	for (size_t j = 0; j < non_SEC_cage.size(); ++j) {
 		if (non_SEC_cage[j].vertex.back() < H2O)
-			ofs_detail << "@cage" << j + 1 << " ";
+			ofs_detail << "@cage" << " ";
 		else
-			ofs_detail << "@a-cage" << j + 1 << " ";
+			ofs_detail << "@a-cage" << " ";
 		printP(non_SEC_cage[j], ofs_detail);
 	}
 	if (IC_cage.size() > 0)
 		ofs_detail << "=========================ICs=========================" << endl;
 	for (size_t j = 0; j < IC_cage.size(); ++j) {
 		if (IC_cage[j].vertex.back() < H2O)
-			ofs_detail << "!cage" << j + 1 << " ";
+			ofs_detail << "!cage"  << " ";
 		else
-			ofs_detail << "!a-cage" << j + 1 << " ";
+			ofs_detail << "!a-cage" << " ";
 		printP(IC_cage[j], ofs_detail);
 	}
 	ofs_crystallinity << i << " ";
@@ -2440,7 +2475,7 @@ void cage::write_cage_details(const int& i,const vector<int> &cage_form,const ve
 	}
 	ofs_crystallinity << fixed << setprecision(3) << static_cast<double>(cage_form_sum) / (H2O + add) << endl;
 }
-void cage::write_cage_summary(int& i,int& fill, int& SEC_cage_size, int& non_SEC_cage_size, int& IC_cage_size){
+void cage::write_cage_summary(int& i,int& fill,int& fill_SEC,int& fill_nSEC,int& fill_IC,int& SEC_cage_size, int& non_SEC_cage_size, int& IC_cage_size){
 	char buffer[256];
 	sprintf(buffer, "%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d",
 		i,
@@ -2456,15 +2491,22 @@ void cage::write_cage_summary(int& i,int& fill, int& SEC_cage_size, int& non_SEC
 	ofs_summary << buffer << endl;
 	if (cal_guest) {
 		int cage_size = SEC_cage_size + non_SEC_cage_size + IC_cage_size;
-		if (cage_size > 0) {
-			double vac = static_cast<double>(fill) / cage_size;
-			sprintf(buffer, "%-8d%-8.3f%-8d%-8d",i, 1 - vac, cage_size, fill);
-			ofs_occupancy << buffer << endl;
-		}
-		else {
-			sprintf(buffer, "%-8d%-8c%-8d%-8d",i, 'x', cage_size, fill);
-			ofs_occupancy << buffer << endl;
-		}
+		double occ      = (cage_size > 0)        ? static_cast<double>(fill)      / cage_size        : -1;
+		double occ_SEC  = (SEC_cage_size > 0)    ? static_cast<double>(fill_SEC)  / SEC_cage_size     : -1;
+		double occ_nSEC = (non_SEC_cage_size > 0)? static_cast<double>(fill_nSEC) / non_SEC_cage_size : -1;
+		double occ_IC   = (IC_cage_size > 0)     ? static_cast<double>(fill_IC)   / IC_cage_size      : -1;
+		char occ_str[16], occ_SEC_str[16], occ_nSEC_str[16], occ_IC_str[16];
+		if (occ >= 0)      sprintf(occ_str,      "%-8.3f", occ);      else sprintf(occ_str,      "%-8s", "x");
+		if (occ_SEC >= 0)  sprintf(occ_SEC_str,  "%-8.3f", occ_SEC);  else sprintf(occ_SEC_str,  "%-8s", "x");
+		if (occ_nSEC >= 0) sprintf(occ_nSEC_str, "%-8.3f", occ_nSEC); else sprintf(occ_nSEC_str, "%-8s", "x");
+		if (occ_IC >= 0)   sprintf(occ_IC_str,   "%-8.3f", occ_IC);   else sprintf(occ_IC_str,   "%-8s", "x");
+		sprintf(buffer, "%-8d%s%-8d%-8d%s%-8d%-8d%s%-8d%-8d%s%-8d%-8d",
+			i,
+			occ_str, cage_size, fill,
+			occ_SEC_str, SEC_cage_size, fill_SEC,
+			occ_nSEC_str, non_SEC_cage_size, fill_nSEC,
+			occ_IC_str, IC_cage_size, fill_IC);
+		ofs_occupancy << buffer << endl;
 	}
 }
 void cage::output_visual(int i,const vector<polyhedron> &SEC_cage,const vector<polyhedron> &non_SEC_cage,const vector<polyhedron> &IC_cage){
@@ -2515,7 +2557,7 @@ void cage::output_visual(int i,const vector<polyhedron> &SEC_cage,const vector<p
 	}
 	//guest
 	if(cal_guest){
-		atom_name="g";
+		atom_name="C";
         	type="guest";
 		for (int j = 0; j < guest; j++) {
 			int id1 = j + 1;
