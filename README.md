@@ -368,7 +368,15 @@ For usage details, please refer to [2.4 Visualization with VMD](#24-visualizatio
 
 ### 5.5 occupancy.txt
 
-This file records the total number of cages (SEC, non-SEC, IC combined) and the number of cages occupied by guest molecules per frame. It also reports the occupancy rate (`occ`), occ is the occupacy rate for all cages, SECs, non-SECs or ICs. Example: ALL_F / ALL.
+This file records the total number of hydrate cages per frame (including SEC, non-SEC, and IC cages) and the number of cages occupied by guest molecules. It also reports the occupancy rate (`occ`), which can be calculated for all cages, SECs, non-SECs, or ICs.
+
+For example, the overall occupancy rate is calculated as:
+
+    occ(ALL) = ALL_F / ALL
+
+where:
+- `ALL` = total number of all cages in the frame
+- `ALL_F` = number of cages currently occupied by guest molecules
 
 ### 5.6 cluster.txt
 
