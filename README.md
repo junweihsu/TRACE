@@ -38,7 +38,11 @@ TRACE achieves both high accuracy and computational efficiency across a wide ran
 - Crystallinity estimation of the entire system.
 - Guest molecule occupancy analysis for each cage.
 
-This tool was developed as part of an academic study on hydrate formation dynamics. For more information, please refer to the upcoming publication [reference pending].
+This tool was developed as part of an academic study on hydrate formation dynamics.  
+For more details, please see our manuscript [reference pending, currently under review at *Journal of Chemical Theory and Computation*].  
+
+Corresponding author: Shiang-Tai Lin (stlin@ntu.edu.tw)  
+Maintainer: Jun-Wei Hsu (qwe88196060@gmail.com)
 
 ## 2. Usage
 
@@ -94,10 +98,6 @@ Once installed and the analysis is complete, launch VMD from the terminal:
 `vmd -e /path/to/TRACE/visualize.tcl`
 
 > By default, the script [`visualize.tcl`](./visualize.tcl) assumes the required files are in the current working directory (`./`).
-
-<img src="TRACE_VMD.png" alt="TRACE VMD Visualization" width="400">
-
->**Note:** For the five selected representations, make sure to check **Update Selection Every Frame** and **Update Color Every Frame**.
 
 ![TRACE Visual Example](TRACE-visual.PNG)
 
