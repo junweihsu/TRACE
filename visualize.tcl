@@ -39,3 +39,10 @@ rotate y by 90
 display projection orthographic
 display depthcue 0
 pbc box
+
+set mid [molinfo top]
+set nrep [molinfo $mid get numreps]
+for {set r 0} {$r < $nrep} {incr r} {
+    mol selupdate $r $mid on
+    mol colupdate $r $mid on
+}
