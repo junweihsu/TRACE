@@ -18,6 +18,10 @@
  * You should have received a copy of the GNU General Public License
  * along with TRACE. If not, see https://www.gnu.org/licenses/.
  */
+
+//Corresponding author: Shiang-Tai Lin (stlin@ntu.edu.tw)
+//Maintainer: Jun-Wei Hsu (qwe88196060@gmail.com)
+
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -129,6 +133,7 @@ public:
 	bool input_guest(int atom_number,point *molecule,int molecule_num);//input geust molecule
 	bool input_H2O(int atom_number,point **molecule,int molecule_num);//input all molecule information of H2O (all atom)
 	bool input_add(int atom_number,point **molecule,int molecule_num);
+	void skip_frame(ifstream &ifs,int file_format);
 	bool input_hbond();
 	void cal_and_output(int i);
 	void print1D(vector<int> vec);
@@ -540,27 +545,34 @@ int main(int argc, char* argv[])
 	i+=shift_frame;cage.initial_frame+=shift_frame;cage.end_frame+=shift_frame;
 	timespec start_whole, end_whole;
         clock_gettime(CLOCK_MONOTONIC, &start_whole);
-        while(1){
+	while(1){
                 timespec start_per_frame, end_per_frame;
                 clock_gettime(CLOCK_MONOTONIC, &start_per_frame);
                 if (i>cage.end_frame) break;
-                terminate=cage.input_H2O(cage.H2O_atom,cage.H2O_molecule,cage.H2O);
-                if (terminate) break;
-                if (cage.cal_additive){
-                        terminate=cage.input_add(cage.add_atom,cage.add_molecule,cage.add);
-                	if(terminate) break;
-		}
-                if (cage.cal_guest) {
-                        terminate=cage.input_guest(cage.guest_atom,cage.guest_molecule,cage.guest);
-                	if(terminate) break;
-		}
 		if (i>=cage.initial_frame) {
+			terminate=cage.input_H2O(cage.H2O_atom,cage.H2O_molecule,cage.H2O);
+			if (terminate) break;
+			if (cage.cal_additive){
+				terminate=cage.input_add(cage.add_atom,cage.add_molecule,cage.add);
+				if(terminate) break;
+			}
+			if (cage.cal_guest) {
+				terminate=cage.input_guest(cage.guest_atom,cage.guest_molecule,cage.guest);
+				if(terminate) break;
+			}
                         cage.build_grid();
                         cage.cal_and_output(i);
                 }
                 else{
-                        cout<<"Skip frame "<<i<<"..."<<endl;
+                        cout<<"Skip frame "<<i<<"... ";
+			cage.skip_frame(cage.ifs_water,cage.file_format1);
+			if(cage.cal_guest)
+                                cage.skip_frame(cage.ifs_guest,cage.file_format2);
+			if (cage.cal_additive)
+				cage.skip_frame(cage.ifs_add,cage.file_format3);
                         i++;
+			clock_gettime(CLOCK_MONOTONIC, &end_per_frame);
+                	cout << fixed << setprecision(3) << get_elapsed_time(start_per_frame, end_per_frame) << " s" << endl;
                         continue;
                 }
 		clock_gettime(CLOCK_MONOTONIC, &end_per_frame);
@@ -1728,6 +1740,17 @@ pair<bool,int> cage::define_molecule(string *type, int *atom_number,string filen
 	return result;
 }
 //=============================function of output and input====================================================
+void cage::skip_frame(ifstream &ifs,int file_format){
+	streampos start_pos = ifs.tellg();
+	string line;
+	int atom_num,skip_byte;
+	getline(ifs, line);
+	ifs>>atom_num;
+	if(file_format==6)
+		ifs.seekg(atom_num*45+32, ifstream::cur);
+	else
+		ifs.seekg(atom_num*69+32, ifstream::cur);
+}
 bool cage::input_guest(int atom_number,point *molecule,int molecule_num) {
 	string line, junk;
 	//cout<<"Wait for reading guest.gro ..."<<endl;
