@@ -41,8 +41,14 @@ TRACE achieves both high accuracy and computational efficiency across a wide ran
 This tool was developed as part of an academic study on hydrate formation dynamics.  
 For more details, please see our manuscript [reference pending, currently under review at *Journal of Chemical Theory and Computation*].  
 
+TRACE v1.0: Topological Ring and Additive-Coordinated Cage Explorer
+
+Copyright (C) 2025
+Jun Wei Hsu, Shiang-Tai Lin
+Computational Molecular Engineering Laboratory
+Department of Chemical Engineering, National Taiwan University, Taipei, Taiwan
+
 Corresponding author: Shiang-Tai Lin (stlin@ntu.edu.tw)  
-Maintainer: Jun-Wei Hsu (qwe88196060@gmail.com)
 
 ## 2. Usage
 
@@ -447,10 +453,6 @@ This means the ring is formed by molecules with indices `1, 167, 178, 181, 297`,
 - Each ring is assumed to form a closed loop based on hydrogen bonding order.
   
 ## 6. License
-TRACE v1.0 - Topological Ring and Additive-Coordinated Cage Explorer
-Copyright (C) 2025 Jun Wei Hsu, Shiang-Tai Lin
-COMET Laboratory, National Taiwan University
-
 TRACE is free software: you can redistribute it and/or modify  
 it under the terms of the GNU General Public License as published  
 by the Free Software Foundation, either version 3 of the License,  
