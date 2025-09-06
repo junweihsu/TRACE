@@ -42,13 +42,8 @@ This tool was developed as part of an academic study on hydrate formation dynami
 For more details, please see our manuscript [reference pending, currently under review at *Journal of Chemical Theory and Computation*].  
 
 TRACE v1.0: Topological Ring and Additive-Coordinated Cage Explorer
-
-Copyright (C) 2025
-
 Jun Wei Hsu, Shiang-Tai Lin
-
 Computational Molecular Engineering Laboratory
-
 Department of Chemical Engineering, National Taiwan University, Taipei, Taiwan
 
 Corresponding author: Shiang-Tai Lin (stlin@ntu.edu.tw)  
