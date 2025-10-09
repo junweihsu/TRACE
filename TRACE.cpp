@@ -18,10 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with TRACE. If not, see https://www.gnu.org/licenses/.
  */
-
-//Corresponding author: Shiang-Tai Lin (stlin@ntu.edu.tw)
-//Maintainer: Jun-Wei Hsu (qwe88196060@gmail.com)
-
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -49,8 +45,8 @@ struct point {
 	double x,y,z;
 };
 struct hbond {
-	string dtype,atype;
-	int d,a,dh;
+	string dtype,atype;//donor type and acceptor type (H2O or additive)
+	int d,a,dh;//donor atom index, acceptor atom index, donor-hydrogen index
 	double th;//theta_cut
 };
 struct ring {
@@ -64,14 +60,14 @@ struct polyhedron{
 	vector<pair<int,int> >  edge; 
 	vector<vector<int> > face;
 	string type;
-	int total;
+	int total;//theoretical isolated vertices (T)
 	int perfect;//0 incomplete 1 complete non EFSC 2 perfect complete cage
 	vector<int> guest_idx;
 	int found;
-	vector<pair<int,double> > add_list;
-	int cluster;
-	point cp;
-	int color_tier;
+	vector<pair<int,double> > add_list;//the list of distance between the additive and the center of the cage
+	int cluster;//cluster id
+	point cp;//center point
+	int color_tier;//index for vmd renderer
         polyhedron() : found(0),total(0),cluster(-1) {}
 };
 struct pair_hash {
@@ -109,18 +105,18 @@ public:
 	int add,add_atom;//additive molecule
 	vector<string> add_name;
 	vector<int> add_atoms;//the atoms that participate in the hydrogen bond
-	unordered_map<pair<int, int>, int, pair_hash> adj_map;
-	vector<vector<vector<vector<int> > > > grid;
+	unordered_map<pair<int, int>, int, pair_hash> adj_map;//hydrogen bond map (record which atom forms hydrogen bonds)
+	vector<vector<vector<vector<int> > > > grid;//3D spatial grid for hydrogen bond identification
 	vector<vector<int> > H2O_adjlist,cage_adjlist; 
 	vector<int> isguest;
 	vector<int> H2O_color;//use for vmd visualize
-	int nt;
+	int nt;//number of tread used
 	int initial_frame,end_frame;
-	int fx,fy,fz;
+	int fx,fy,fz;//Number of grids the system is divided into (fx*fy*fz) 
 	bool grid_flag;
-	vector<hbond> hbond_H2O_add,hbond_add_add;
+	vector<hbond> hbond_H2O_add,hbond_add_add;//Load the hydrogen bond information from hbond.txt 
 	double dt,rcut,theta,cos_theta,acut;//water-water rcut water-additive acut
-	double IA_tolerance,DA_tolerance;
+	double IA_tolerance,DA_tolerance;//interior and dihedral angle tolerance
 	int file_format1,file_format2,file_format3,max_ring;//determine gro file format
 	bool cal_guest,cal_additive,cal_box;
 	string cl,rm;
@@ -146,12 +142,12 @@ public:
 	void write_cage_details(const int& i,const vector<int> &cage_form,const vector<polyhedron> &SEC_cage,const vector<polyhedron> &non_SEC_cage,const vector<polyhedron> &IC_cage);
 	void write_cage_summary(int& i,int& fill,int& fill_SEC,int& fill_nSEC,int& fill_IC,int& SEC_cage_size, int& non_SEC_cage_size, int& IC_cage_size);	
 	void output_visual(int i,const vector<polyhedron> &SEC_cage,const vector<polyhedron> &non_SEC_cage,const vector<polyhedron> &IC_cage);
-	//function of calulation
+	//====function of calulation====
 	double PBC_dist(point a,point b);//cal the distance between a molecule and b in pbc
-	double PBC_angle(point a,point b,point c);
+	double PBC_angle(point a,point b,point c);//cal the angle between three point
 	point PBC_vector(point a, point b);
-        point PBC_average(const vector<point>& p);
-	point PBC_average_P(const polyhedron& P);
+        point PBC_average(const vector<point>& p);//center point of vertices
+	point PBC_average_P(const polyhedron& P);//center point of polyhedra
 	pair<bool,int> define_molecule(string* type, int *atom_number,string filename,int &molecule_num,bool additive = false);//define the numbers of atom per molecule and molecule type
 	void ring_dfs(int istart,int& ispath,unordered_set<vector<int>, VectorHash>& path,ring& local_ring,vector<int>& visited,point n1,int level,int max_level,vector<ring> &local_rings);
 	pair<bool,double> check_planarity(int& level,ring& ring,point n1);
@@ -166,11 +162,11 @@ public:
 	bool contain_face(const vector<int>& vec, const vector<vector<int> >& vecs);
 	bool share_edge(const vector<pair<int,int> >& vec1, const vector<pair<int,int> >& vec2);
 	void find_cage(vector<polyhedron*>& cup_group,vector<polyhedron>& cage,unordered_map<vector<int>, vector<polyhedron*> *, VectorHash>& grouped,int& type);
-	//find cage cluster
+	//====find cage cluster====
         void build_cage_matrix(vector<polyhedron>& ALLcage);
 	void cage_dfs(int i, vector<int>& cluster, vector<int>& visited);
 	void find_cluster(vector<vector<int> >& groups,const int& n);
-	//other function
+	//====other function====
 	string intToString(int number);
 	void build_hbond_map();
 	void define_cage(polyhedron &P,int iframe,int perfect,int &fill,int &fill_type);
@@ -179,7 +175,7 @@ public:
         point cross_product(point v1, point v2);
         double dihedral(point n1, point n2);
 	void init();
-        //recursive funtion
+        //====recursive funtion====
 	void lateral_ring_combine(
         	vector<vector<ring*> >& lateral_ring_grouped_vec,
         	vector<ring*>& current_combination,
@@ -536,7 +532,7 @@ int main(int argc, char* argv[])
         cage.ofs_summary<<"#Frame  cage    cage    cage    cage    cage    cage    cage    cage    cage    cage    cage    cage    cage    cage    cage    cage    cage    cage    cage    cage    cage    "<<endl;
         cage.ofs_summary<<"#       SEC     non-SEC IC      others  0,12,0  0,12,2  0,12,3  0,12,4  0,12,5  0,12,6  0,12,8  1,10,2  1,10,3  1,10,4  1,10,5  2,8,1   2,8,2   2,8,3   2,8,4   3,6,3   3,6,4  "<<endl;
         cage.ofs_cluster<<"#Frame cluster 1 (size) ... cluster n (size)"<<endl;
-	cage.ofs_crystallinity<<"#frame 1:H2O ... Nw:H2O ... Na:add  Crystallinity (The number of cages each molecule participates)"<<endl;
+	cage.ofs_crystallinity<<"#frame 1:H2O ... Nw:H2O ... Na:add  Crystallinity index(CI) (The number of cages each molecule participates)"<<endl;
         cage.ofs_ring_count<<"#frame 1:H2O ... Nw:H2O ... Na:add (The number of 4rings,5rings,6rings each molecule participates)"<<endl;
         cout<<"Start the calculation ..."<<endl;
 	bool terminate=true;
@@ -1481,10 +1477,8 @@ void cage::find_cage_ICO(int layer, int max_layer,
 void cage::find_cage(vector<polyhedron*>& cup_group, vector<polyhedron>& cage, unordered_map<vector<int>, vector<polyhedron*> *, VectorHash>& grouped,int& type) {
 	//#pragma omp parallel 
 	{
-		//vector<polyhedron> local_cage;
 		size_t cup_group_size=cup_group.size();
 		//#pragma omp for schedule(static,1)
-		//for (int i = 0; i < 1; i++) {
 		for (int i = 0; i < cup_group_size; i++) {
 			if (cup_group[i]->found>0) continue;
 			vector<vector<int> > remaining_face, pre_layer_face;
@@ -2496,7 +2490,7 @@ void cage::write_cage_details(const int& i,const vector<int> &cage_form,const ve
 		ofs_crystallinity << cage_form[j] << " ";
 		cage_form_sum += cage_form[j];
 	}
-	ofs_crystallinity << fixed << setprecision(3) << static_cast<double>(cage_form_sum) / (H2O + add) << endl;
+	ofs_crystallinity << fixed << setprecision(3) << static_cast<double>(cage_form_sum) / H2O /4<< endl;
 }
 void cage::write_cage_summary(int& i,int& fill,int& fill_SEC,int& fill_nSEC,int& fill_IC,int& SEC_cage_size, int& non_SEC_cage_size, int& IC_cage_size){
 	char buffer[256];
