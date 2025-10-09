@@ -409,11 +409,11 @@ Records how many cages (SECs + non-SECs + IC) each molecule (water or additive) 
 
 Example format:
 
-#frame 1H2O ... nH2O ... nadd Crystallinity
+#frame 1H2O ... nH2O ... nadd Crystallinity index (CI)
 
-1 4 3 4 ... 4 3.750
+1 4 3 4 ... 4 0.980
 
-2 4 4 4 ... 4 4.000
+2 4 4 4 ... 4 1.000
 
 ...
 
