@@ -102,7 +102,7 @@ Once installed and the analysis is complete, launch VMD from the terminal:
 `vmd -e /path/to/TRACE/visualize.tcl`
 
 > By default, the script [`visualize.tcl`](./visualize.tcl) assumes the required files are in the current working directory (`./`).
-
+> Note: You may encounter a Segmentation fault (core dumped). If this occurs, try running the command multiple times.
 ![TRACE Visual Example](TRACE-visual.PNG)
 
 ## 3. File Format
