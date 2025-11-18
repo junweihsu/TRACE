@@ -39,7 +39,7 @@ TRACE achieves both high accuracy and computational efficiency across a wide ran
 - Guest molecule occupancy analysis for each cage.
 
 This tool was developed as part of an academic study on hydrate formation dynamics.  
-For more details, please see our manuscript [TRACE: A Topological Algorithm for Detecting Additive-Coordinated Hydrate Cages](https://pubs.acs.org/page/pdf_proof?ref=pdf) 
+For more details, please see our manuscript [TRACE: A Topological Algorithm for Detecting Additive-Coordinated Hydrate Cages]([https://pubs.acs.org/page/pdf_proof?ref=pdf](https://pubs.acs.org/doi/pdf/10.1021/acs.jctc.5c01459?ref=article_openPDF)) 
 
 TRACE v1.0: Topological Ring and Additive-Coordinated Cage Explorer  
 Jun Wei Hsu, Shiang-Tai Lin  
