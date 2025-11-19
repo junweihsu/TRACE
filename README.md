@@ -39,7 +39,8 @@ TRACE achieves both high accuracy and computational efficiency across a wide ran
 - Guest molecule occupancy analysis for each cage.
 
 This tool was developed as part of an academic study on hydrate formation dynamics.  
-For more details, please see our manuscript [reference pending, currently under review at *Journal of Chemical Theory and Computation*].  
+For more details, please see our manuscript  
+[TRACE: A Topological Algorithm for Detecting Additive-Coordinated Hydrate Cages](https://pubs.acs.org/doi/full/10.1021/acs.jctc.5c01459)
 
 TRACE v1.0: Topological Ring and Additive-Coordinated Cage Explorer  
 Jun Wei Hsu, Shiang-Tai Lin  
@@ -103,6 +104,7 @@ Once installed and the analysis is complete, launch VMD from the terminal:
 
 > By default, the script [`visualize.tcl`](./visualize.tcl) assumes the required files are in the current working directory (`./`).
 
+> Note: You may encounter a Segmentation fault (core dumped). If this occurs, try running the command multiple times.
 ![TRACE Visual Example](TRACE-visual.PNG)
 
 ## 3. File Format
@@ -269,6 +271,8 @@ Only the `-w` option is required; all others are optional.
 | `-nb`   | `4 4 4`         | Number of sub-boxes in `x y z` (default: box length / 1.2 nm, rounded) |
 | `-nt`   | `8`             | Number of threads to use (default: `1`) |
 
+> 💡 **Note:** To better utilize CPU resources, especially when near 100% utilization is desired, instead of using -nt, the trajectory can be segmented into multiple parts, with each segment assigned to a different CPU instance. The results can then be merged afterward (see Section 5 of the Supporting Information in our manuscript).
+
 ## 5. Output Files and Analysis
 
 TRACE generates **9 output files** in the current working directory.  
@@ -408,11 +412,11 @@ Records how many cages (SECs + non-SECs + IC) each molecule (water or additive) 
 
 Example format:
 
-#frame 1H2O ... nH2O ... nadd Crystallinity
+#frame 1H2O ... nH2O ... nadd Crystallinity index (CI)
 
-1 4 3 4 ... 4 3.750
+1 4 3 4 ... 4 0.980
 
-2 4 4 4 ... 4 4.000
+2 4 4 4 ... 4 1.000
 
 ...
 
