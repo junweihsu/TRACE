@@ -273,6 +273,8 @@ Only the `-w` option is required; all others are optional.
 
 > 💡 **Note:** To better utilize CPU resources, especially when near 100% utilization is desired, instead of using -nt, the trajectory can be segmented into multiple parts, with each segment assigned to a different CPU instance. The results can then be merged afterward (see Section 5 of the Supporting Information in our manuscript).
 
+> 💡 **Note:** Disabling the hydrogen-bond angle cutoff may lead to incorrect structure identification (see Figure S9 in the Supporting Information of our manuscript).
+
 ## 5. Output Files and Analysis
 
 TRACE generates **9 output files** in the current working directory.  
