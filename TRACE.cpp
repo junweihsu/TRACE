@@ -2568,7 +2568,7 @@ void cage::output_visual(int i,const vector<polyhedron> &SEC_cage,const vector<p
 	for (int j = 0; j < H2O; j++) {
 		int id1 = j + 1;
 		if (id1 > 99999) id1 %= 100000;
-		sprintf(text, "%5d%-5s%5s%5d%8.3f%8.3f%8.3f%",id1, type.c_str() , atom_name.c_str(), id1,H2O_molecule[j][0].x ,H2O_molecule[j][0].y ,H2O_molecule[j][0].z);
+		sprintf(text, "%5d%-5s%5s%5d%8.3f%8.3f%8.3f",id1, type.c_str() , atom_name.c_str(), id1,H2O_molecule[j][0].x ,H2O_molecule[j][0].y ,H2O_molecule[j][0].z);
 		ofs_visual_gro<<text<<endl;
 		ofs_visual_index<<H2O_color[j]<<" ";
 	}
@@ -2579,7 +2579,7 @@ void cage::output_visual(int i,const vector<polyhedron> &SEC_cage,const vector<p
 		for (int j = 0; j < guest; j++) {
 			int id1 = j + 1;
 			if (id1 > 99999) id1 %= 100000;
-			sprintf(text, "%5d%-5s%5s%5d%8.3f%8.3f%8.3f%",id1, type.c_str() , atom_name.c_str(),id1,guest_molecule[j].x ,guest_molecule[j].y,guest_molecule[j].z);
+			sprintf(text, "%5d%-5s%5s%5d%8.3f%8.3f%8.3f",id1, type.c_str() , atom_name.c_str(),id1,guest_molecule[j].x ,guest_molecule[j].y,guest_molecule[j].z);
 			ofs_visual_gro<<text<<endl;
 			ofs_visual_index<<9<<" ";
         	}
@@ -2594,7 +2594,7 @@ void cage::output_visual(int i,const vector<polyhedron> &SEC_cage,const vector<p
                                 int id2 = j * add_atom + k + 1;
                                 if (id1 > 99999) id1 %= 100000;
                                 if (id2 > 99999) id2 %= 100000;
-                                sprintf(text, "%5d%-5s%5s%5d%8.3f%8.3f%8.3f%",id1, type.c_str() , add_name[k].c_str(), id2,add_molecule[j][k].x ,add_molecule[j][k].y ,add_molecule[j][k].z);
+                                sprintf(text, "%5d%-5s%5s%5d%8.3f%8.3f%8.3f",id1, type.c_str() , add_name[k].c_str(), id2,add_molecule[j][k].x ,add_molecule[j][k].y ,add_molecule[j][k].z);
                         	ofs_visual_gro<<text<<endl;
                         	ofs_visual_index<<10<<" ";
 			}
@@ -2605,3 +2605,4 @@ void cage::output_visual(int i,const vector<polyhedron> &SEC_cage,const vector<p
         ofs_visual_gro<<text<<endl;	
 	ofs_visual_index<<endl;
 }
+
