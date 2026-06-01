@@ -63,7 +63,7 @@ Compile TRACE using `g++` with OpenMP support:
 
 `g++ -fopenmp /path/to/TRACE/TRACE.cpp -o /path/to/TRACE/TRACE.exe`
 - Tested on g++ (GCC) 13.2.0. A compatibility fix was introduced for newer GCC versions (see commit history of TRACE.cpp for details).
-- A C++ compiler supporting at least C++8.4 standard.
+- A C++ compiler supporting at least the C++11 standard (GCC 8.4 or later recommended).
 
 ### 2.3 Run TRACE
 
