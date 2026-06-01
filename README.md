@@ -66,6 +66,10 @@ Compile TRACE using `g++` with OpenMP support:
 - A C++ compiler supporting at least C++11 standard (e.g., g++ 4.8 or later).
 - OpenMP support enabled (g++ 4.8 or later recommended).
 
+> *Note on compiler compatibility* 
+> *Tested on g++ (GCC) 13.2.0.* 
+> *A compatibility fix was introduced for newer GCC versions (See commit history for implementation details).* 
+
 ### 2.3 Run TRACE
 
 `cd /path/to/TRACE/example`
