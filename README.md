@@ -62,10 +62,8 @@ Clone the repository to your desired directory (replace `/path/to/TRACE` with yo
 Compile TRACE using `g++` with OpenMP support:
 
 `g++ -fopenmp /path/to/TRACE/TRACE.cpp -o /path/to/TRACE/TRACE.exe`
-
-- A C++ compiler supporting at least C++11 standard (e.g., g++ 4.8 or later).
-- OpenMP support enabled (g++ 4.8 or later recommended).
 - Tested on g++ (GCC) 13.2.0. A compatibility fix was introduced for newer GCC versions (see commit history of TRACE.cpp for details).
+- A C++ compiler supporting at least C++8.4 standard.
 
 ### 2.3 Run TRACE
 
