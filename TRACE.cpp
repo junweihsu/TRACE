@@ -1370,7 +1370,7 @@ void cage::find_cage_ICO(int layer, int max_layer,
 	vector<polyhedron>& cage,int& type) {
 	if (layer >= 3) {
 		int total_vertex = 0;
-		for (unordered_set<vector<int> >::const_iterator it = uni_face.begin(); it != uni_face.end(); ++it)
+		for (unordered_set<vector<int>, VectorHash >::const_iterator it = uni_face.begin(); it != uni_face.end(); ++it)
 			total_vertex += it->size();
 		if (uni_vertice.size() * 3 <= total_vertex + type ) {
 			polyhedron P;
